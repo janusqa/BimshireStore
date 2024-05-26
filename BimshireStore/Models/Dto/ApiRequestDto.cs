@@ -1,12 +1,14 @@
-using System.Net;
+using static BimshireStore.Utility.SD;
 
 namespace BimshireStore.Models.Dto
 {
     public record ApiRequest
     {
-        public string ApiType { get; set; } = "GET";
-        public string? Url { get; set; }
-        public string? AccessToken { get; set; }
+        public ApiMethod ApiMethod { get; set; } = ApiMethod.GET;
+        public string Url { get; set; } = string.Empty;
         public object? Data { get; set; }
+        public ContentType ContentType { get; set; } = ContentType.Json;
+        public bool WithCredentials { get; set; } = false;
+        public string? AccessToken { get; set; } = null;
     }
 }

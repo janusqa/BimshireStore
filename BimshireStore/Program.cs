@@ -1,7 +1,24 @@
+using BimshireStore.Service;
+using BimshireStore.Service.IService;
+using BimshireStore.Utility;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddScoped<ICouponService, CouponService>();
+
+// HTTPClient
+SD.CouponApiBaseAddress = builder.Configuration["ServiceUris:CouponApi"]
+    ?? throw new InvalidOperationException("Invalid CouponAPI base Address");
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddHttpClient();
+builder.Services.AddHttpClient<ICouponService, CouponService>()
+.ConfigurePrimaryHttpMessageHandler(() =>
+    // !!! DISABLE IN PROD. THIS IS TO BYPASS CHECKING SSL CERT AUTH FOR DEV PURPOSES !!!
+    new HttpClientHandler { ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator }
+);
 
 var app = builder.Build();
 
