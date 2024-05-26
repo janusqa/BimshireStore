@@ -1,7 +1,7 @@
 namespace BimshireStore.Services.CouponAPI.Models.Dto
 {
 
-    public class CouponDto
+    public record CouponDto
     {
         public int CouponId { get; set; }
         public required string CouponCode { get; set; }
