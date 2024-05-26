@@ -8,6 +8,10 @@ API
 - dotnet add Services/BimshireStore.Services.CouponAPI package Microsoft.AspNetCore.DataProtection.EntityFrameworkCore
 - dotnet add Services/BimshireStore.Services.CouponAPI package Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore
 
+Frontend
+===
+dotnet new mvc -o [<project-name>]
+
 
 Migrations
 ===
