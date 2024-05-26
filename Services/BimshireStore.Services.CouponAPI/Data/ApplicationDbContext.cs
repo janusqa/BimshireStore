@@ -21,6 +21,10 @@ namespace BimshireStore.Services.CouponAPI.Data
             // ERROR: InvalidOperationException: The entity type 'IdentityUserLogin<string>' requires a primary key to be defined. If you intended to use a keyless entity type, call 'HasNoKey' in 'OnModelCreating'. For more information on keyless entity types, see https://go.microsoft.com/fwlink/?linkid=2141943.
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<Coupon>().HasData(
+                new Coupon { CouponId = 1, CouponCode = "10OFF", DiscountAmount = 10, MinAmount = 20 },
+                new Coupon { CouponId = 2, CouponCode = "20OFF", DiscountAmount = 20, MinAmount = 40 }
+            );
 
         }
 
@@ -33,3 +37,4 @@ namespace BimshireStore.Services.CouponAPI.Data
         }
     }
 }
+
