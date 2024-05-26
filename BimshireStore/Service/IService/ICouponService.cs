@@ -1,5 +1,3 @@
-
-
 using BimshireStore.Models.Dto;
 
 namespace BimshireStore.Service.IService

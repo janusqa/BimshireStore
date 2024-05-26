@@ -8,13 +8,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddScoped<ICouponService, CouponService>();
+builder.Services.AddSingleton<IHttpRequestMessageBuilder, HttpRequestMessageBuilder>();
 
 // HTTPClient
 SD.CouponApiBaseAddress = builder.Configuration["ServiceUris:CouponApi"]
     ?? throw new InvalidOperationException("Invalid CouponAPI base Address");
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddHttpClient();
-builder.Services.AddHttpClient<ICouponService, CouponService>()
+builder.Services.AddHttpClient("BimshireStoreApi")
 .ConfigurePrimaryHttpMessageHandler(() =>
     // !!! DISABLE IN PROD. THIS IS TO BYPASS CHECKING SSL CERT AUTH FOR DEV PURPOSES !!!
     new HttpClientHandler { ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator }

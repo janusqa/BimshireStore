@@ -6,7 +6,7 @@ namespace BimshireStore.Service
 {
     public class CouponService : BaseService, ICouponService
     {
-        public CouponService(IHttpClientFactory hcf) : base(hcf)
+        public CouponService(IHttpClientFactory hcf, IHttpRequestMessageBuilder mb) : base(hcf, mb)
         {
         }
 

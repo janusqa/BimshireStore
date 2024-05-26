@@ -1,3 +1,5 @@
+using System.Text.Json;
+
 namespace BimshireStore.Utility
 {
 
@@ -18,5 +20,10 @@ namespace BimshireStore.Utility
         }
 
         public static string? CouponApiBaseAddress { get; set; }
+    }
+
+    public static class JsonSerializerConfig
+    {
+        public static readonly JsonSerializerOptions DefaultOptions = new() { PropertyNameCaseInsensitive = true };
     }
 }
