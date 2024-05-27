@@ -51,6 +51,7 @@ public class CouponController : Controller
             var response = await _couponService.CreateCouponAsync(coupon);
             if (response is not null && response.IsSuccess)
             {
+                TempData["success"] = "Operation completed successfully";
                 return RedirectToAction(nameof(CouponIndex));
             }
             else
@@ -82,17 +83,16 @@ public class CouponController : Controller
     [HttpPost]
     public async Task<IActionResult> CouponDelete(CouponDto coupon)
     {
-        if (ModelState.IsValid)
+
+        var response = await _couponService.DeleteCouponAsync(coupon.CouponId);
+        if (response is not null && response.IsSuccess)
         {
-            var response = await _couponService.DeleteCouponAsync(coupon.CouponId);
-            if (response is not null && response.IsSuccess)
-            {
-                return RedirectToAction(nameof(CouponIndex));
-            }
-            else
-            {
-                TempData["error"] = string.Join(" | ", response?.ErrorMessages ?? ["Oops, Something went wrong"]);
-            }
+            TempData["success"] = "Operation completed successfully";
+            return RedirectToAction(nameof(CouponIndex));
+        }
+        else
+        {
+            TempData["error"] = string.Join(" | ", response?.ErrorMessages ?? ["Oops, Something went wrong"]);
         }
 
         return View(coupon);
