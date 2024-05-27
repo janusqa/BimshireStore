@@ -8,6 +8,21 @@ API
 - dotnet add BimshireStore.Services.CouponAPI package Microsoft.AspNetCore.DataProtection.EntityFrameworkCore
 - dotnet add BimshireStore.Services.CouponAPI package Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore
 
+Auth API (additional packages)
+===
+- dotnet add BimshireStore.Services.AuthAPI package Microsoft.AspNetCore.Identity.EntityFrameworkCore
+
+Auth API (additional config)
+- add "app.UseAuthentication()" above "app.UseAuthorization()" in program.cs;
+- add Identity to services
+    ```
+    // AuthN
+    builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
+    ```
+
+
 Frontend
 ===
 dotnet new mvc -o [<project-name>]
