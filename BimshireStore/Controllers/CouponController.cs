@@ -31,11 +31,10 @@ public class CouponController : Controller
         }
         else
         {
+            TempData["error"] = string.Join(" | ", response?.ErrorMessages ?? ["Oops, Something went wrong"]);
             return View(new List<CouponDto>());
         }
-
     }
-
 
     [HttpGet]
     public async Task<IActionResult> CouponCreate()
@@ -53,6 +52,46 @@ public class CouponController : Controller
             if (response is not null && response.IsSuccess)
             {
                 return RedirectToAction(nameof(CouponIndex));
+            }
+            else
+            {
+                TempData["error"] = string.Join(" | ", response?.ErrorMessages ?? ["Oops, Something went wrong"]);
+            }
+        }
+
+        return View(coupon);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> CouponDelete(int couponId)
+    {
+        var response = await _couponService.GetCouponByIdAsync(couponId);
+
+        if (response is not null && response.IsSuccess)
+        {
+            var coupon = JsonSerializer.Deserialize<CouponDto>(JsonSerializer.Serialize(response.Result), JsonSerializerConfig.DefaultOptions);
+            return View(coupon);
+        }
+        else
+        {
+            TempData["error"] = string.Join(" | ", response?.ErrorMessages ?? ["Oops, Something went wrong"]);
+            return NotFound();
+        }
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> CouponDelete(CouponDto coupon)
+    {
+        if (ModelState.IsValid)
+        {
+            var response = await _couponService.DeleteCouponAsync(coupon.CouponId);
+            if (response is not null && response.IsSuccess)
+            {
+                return RedirectToAction(nameof(CouponIndex));
+            }
+            else
+            {
+                TempData["error"] = string.Join(" | ", response?.ErrorMessages ?? ["Oops, Something went wrong"]);
             }
         }
 

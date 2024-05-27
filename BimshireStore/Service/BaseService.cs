@@ -3,7 +3,6 @@ using System.Text.Json;
 using BimshireStore.Models.Dto;
 using BimshireStore.Service.IService;
 using BimshireStore.Utility;
-using static BimshireStore.Utility.SD;
 
 namespace BimshireStore.Service
 {
@@ -25,32 +24,32 @@ namespace BimshireStore.Service
 
             var messageFactory = () => _mb.Build(request);
 
-            HttpResponseMessage? responseMessage = await client.SendAsync(messageFactory());
-
             try
             {
+                HttpResponseMessage? responseMessage = await client.SendAsync(messageFactory());
+
                 var jsonResponse = await responseMessage.Content.ReadAsStringAsync();
 
-                if (string.IsNullOrWhiteSpace(jsonResponse)) throw new Exception("Empty response from service");
+                if (!responseMessage.IsSuccessStatusCode)
+                {
+                    var errorMessage = responseMessage.StatusCode switch
+                    {
+                        HttpStatusCode.NotFound => "Not Found",
+                        HttpStatusCode.BadRequest => "Bad Request",
+                        HttpStatusCode.Forbidden => "Access Denied",
+                        HttpStatusCode.Unauthorized => "Unauthorized",
+                        HttpStatusCode.InternalServerError => "Internal Server Error",
+                        _ => "Oops, something went wrong. Please try again later"
+                    };
+
+                    throw new Exception(errorMessage);
+                }
 
                 var apiResponse = JsonSerializer.Deserialize<ApiResponse>(jsonResponse, JsonSerializerConfig.DefaultOptions);
-
-                if (!responseMessage.IsSuccessStatusCode && apiResponse is not null)
-                {
-                    apiResponse.ErrorMessages = responseMessage.StatusCode switch
-                    {
-                        HttpStatusCode.NotFound => [.. (apiResponse.ErrorMessages ?? []), "Not Found"],
-                        HttpStatusCode.Forbidden => [.. (apiResponse.ErrorMessages ?? []), "Access Denied"],
-                        HttpStatusCode.Unauthorized => [.. (apiResponse.ErrorMessages ?? []), "Unauthorized"],
-                        HttpStatusCode.InternalServerError => [.. (apiResponse.ErrorMessages ?? []), "Internal Server Error"],
-                        _ => [.. (apiResponse.ErrorMessages ?? []), "Oops, something went wrong. Please try again later"]
-                    };
-                }
 
                 if (apiResponse is not null)
                 {
                     apiResponse.StatusCode = responseMessage.StatusCode;
-                    // var response = JsonSerializer.Deserialize<ApiResponse>(JsonSerializer.Serialize(apiResponse));
                     return apiResponse;
                 }
                 else
