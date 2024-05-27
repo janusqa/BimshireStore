@@ -1,0 +1,6 @@
+@BimshireStore.Services.AuthAPI_HostAddress = http://localhost:5272
+
+GET {{BimshireStore.Services.AuthAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
