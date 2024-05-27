@@ -237,7 +237,7 @@ var jwtSecret = config["ApiSettings:JwtAccessSecret"]
 generate jwt key
 openssl rand 256 | base64
 OR
-node -e "console.log(require('crypto').randomBytes(32).toString('hex'))
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 
 
 IDENTITY ROLES

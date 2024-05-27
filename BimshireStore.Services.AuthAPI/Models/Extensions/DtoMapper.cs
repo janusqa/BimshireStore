@@ -1,6 +1,6 @@
-using BimshireStore.Services.CouponAPI.Models.Dto;
+using BimshireStore.Services.AuthAPI.Models.Dto;
 
-namespace BimshireStore.Services.CouponAPI.Models.Extensions
+namespace BimshireStore.Services.AuthAPI.Models.Extensions
 {
     public static class DtoMapper
     {
@@ -10,14 +10,15 @@ namespace BimshireStore.Services.CouponAPI.Models.Extensions
         // which looks much better than DomainExtension.ToDto(myModel).
         // aka it is syntactic sugar over the static method.
 
-        public static CouponDto ToDto(this Coupon Coupon)
+        public static UserDto ToDto(this ApplicationUser user)
         {
-            return new CouponDto
+            return new UserDto
             {
-                CouponId = Coupon.CouponId,
-                CouponCode = Coupon.CouponCode ?? string.Empty,
-                DiscountAmount = Coupon.DiscountAmount,
-                MinAmount = Coupon.MinAmount
+                Id = user.Id,
+                UserName = user.UserName ?? string.Empty,
+                Email = user.Email ?? string.Empty,
+                Name = user.Name,
+                PhoneNumber = user.PhoneNumber
             };
         }
 

@@ -1,8 +1,13 @@
+using System.Text;
 using BimshireStore.Services.AuthAPI.Data;
 using BimshireStore.Services.AuthAPI.Models;
+using BimshireStore.Services.AuthAPI.Services;
+using BimshireStore.Services.AuthAPI.Services.IService;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,15 +28,40 @@ builder.Services.AddDataProtection()
     .SetApplicationName("BimshireStore.Services.AuthAPI")
     .PersistKeysToDbContext<ApplicationDbContext>();
 
-// Identity
-builder.Services.AddIdentityCore<ApplicationUser>()
-    .AddRoles<IdentityRole>() // IMPORTANT THIS MUST APPEAR FIRST RIGHT HERE
-    .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddApiEndpoints()
-    .AddDefaultTokenProviders();
-
 // Authentication - Bearer Token
-builder.Services.AddAuthentication().AddBearerToken(IdentityConstants.BearerScheme);
+var jwtSettings = new JwtSettings();
+builder.Configuration.Bind(nameof(JwtSettings), jwtSettings);
+
+var jwtSection = builder.Configuration.GetSection(nameof(JwtSettings));
+builder.Services.Configure<JwtSettings>(jwtSection);
+
+builder.Services
+     .AddAuthentication(x =>
+     {
+         x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+         x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+         x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+
+     })
+     .AddJwtBearer(jwt =>
+     {
+         jwt.SaveToken = true;
+         jwt.TokenValidationParameters = new TokenValidationParameters
+         {
+             ValidateIssuerSigningKey = true,
+             IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtSettings.SigningKey ?? throw new InvalidOperationException())),
+             ValidateIssuer = true,
+             ValidIssuer = jwtSettings.Issuer,
+             ValidAudiences = jwtSettings.Audiences,
+             RequireExpirationTime = false,
+             ValidateLifetime = true
+         };
+         jwt.Audience = jwtSettings.Audiences?[0];
+         jwt.ClaimsIssuer = jwtSettings.Issuer;
+
+     });
+
+// builder.Services.AddAuthentication().AddBearerToken(IdentityConstants.BearerScheme);
 
 // Authentication - Cookies
 // builder.Services.AddAuthentication(options =>
@@ -40,11 +70,21 @@ builder.Services.AddAuthentication().AddBearerToken(IdentityConstants.BearerSche
 //     options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
 // }).AddIdentityCookies();
 
+// Identity
+builder.Services.AddIdentityCore<ApplicationUser>()
+    .AddRoles<IdentityRole>() // IMPORTANT THIS MUST APPEAR FIRST RIGHT HERE
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddSignInManager();
+// .AddDefaultTokenProviders();
+// .AddApiEndpoints();
+
 // Authorization
 builder.Services.AddAuthorizationBuilder();
 
 // Other Services
 builder.Services.AddScoped<IDbInitializer, DbInitializer>();
+builder.Services.AddScoped<IdentityService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 // Swagger
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -70,7 +110,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.MapIdentityApi<ApplicationUser>();
+// app.MapIdentityApi<ApplicationUser>();
 
 app.Run();
 

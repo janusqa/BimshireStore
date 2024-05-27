@@ -1,7 +1,7 @@
-using AppLib.Models.Extensions;
 using BimshireStore.Services.CouponAPI.Data;
 using BimshireStore.Services.CouponAPI.Models;
 using BimshireStore.Services.CouponAPI.Models.Dto;
+using BimshireStore.Services.CouponAPI.Models.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
