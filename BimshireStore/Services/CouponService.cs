@@ -1,8 +1,8 @@
 using BimshireStore.Models.Dto;
-using BimshireStore.Service.IService;
+using BimshireStore.Services.IService;
 using BimshireStore.Utility;
 
-namespace BimshireStore.Service
+namespace BimshireStore.Services
 {
     public class CouponService : BaseService, ICouponService
     {

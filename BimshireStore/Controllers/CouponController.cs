@@ -1,10 +1,10 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using BimshireStore.Models;
-using BimshireStore.Service.IService;
+using BimshireStore.Services.IService;
 using System.Text.Json;
 using BimshireStore.Models.Dto;
-using BimshireStore.Utility;
+using static BimshireStore.Utility.SD;
 
 namespace BimshireStore.Controllers;
 

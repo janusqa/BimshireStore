@@ -2,7 +2,7 @@
 using System.Text;
 using System.Text.Json;
 using BimshireStore.Models.Dto;
-using BimshireStore.Service.IService;
+using BimshireStore.Services.IService;
 using BimshireStore.Utility;
 using Microsoft.AspNetCore.Components.Forms;
 

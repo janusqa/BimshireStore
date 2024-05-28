@@ -1,10 +1,10 @@
 using System.Net;
 using System.Text.Json;
 using BimshireStore.Models.Dto;
-using BimshireStore.Service.IService;
-using BimshireStore.Utility;
+using BimshireStore.Services.IService;
+using static BimshireStore.Utility.SD;
 
-namespace BimshireStore.Service
+namespace BimshireStore.Services
 {
     public class BaseService : IBaseService
     {

@@ -1,5 +1,6 @@
 using BimshireStore.Service;
-using BimshireStore.Service.IService;
+using BimshireStore.Services;
+using BimshireStore.Services.IService;
 using BimshireStore.Utility;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,11 +9,16 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddScoped<ICouponService, CouponService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddSingleton<IHttpRequestMessageBuilder, HttpRequestMessageBuilder>();
 
-// HTTPClient
+// API URIs
 SD.CouponApiBaseAddress = builder.Configuration["ServiceUris:CouponApi"]
     ?? throw new InvalidOperationException("Invalid CouponAPI base Address");
+SD.AuthApiBaseAddress = builder.Configuration["ServiceUris:AuthApi"]
+    ?? throw new InvalidOperationException("Invalid AuthAPI base Address");
+
+// HTTPClient
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient("BimshireStoreApi")
 .ConfigurePrimaryHttpMessageHandler(() =>

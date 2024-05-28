@@ -20,10 +20,17 @@ namespace BimshireStore.Utility
         }
 
         public static string? CouponApiBaseAddress { get; set; }
-    }
+        public static string? AuthApiBaseAddress { get; set; }
 
-    public static class JsonSerializerConfig
-    {
-        public static readonly JsonSerializerOptions DefaultOptions = new() { PropertyNameCaseInsensitive = true };
+        // Role Constants
+        public const string Role_Customer = "Customer";
+        public const string Role_Admin = "Admin";
+        public const string Role_Employee = "Employee";
+
+        public static class JsonSerializerConfig
+        {
+            public static readonly JsonSerializerOptions DefaultOptions = new() { PropertyNameCaseInsensitive = true };
+        }
+
     }
 }
