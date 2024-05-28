@@ -7,6 +7,10 @@ using BimshireStore.Models.Dto;
 using static BimshireStore.Utility.SD;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using BimshireStore.Utility;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using System.Security.Claims;
+using Microsoft.IdentityModel.JsonWebTokens;
 
 namespace BimshireStore.Controllers;
 
@@ -14,11 +18,13 @@ public class AuthController : Controller
 {
     private readonly ILogger<AuthController> _logger;
     private readonly IAuthService _authService;
+    private readonly ITokenService _tokenService;
 
-    public AuthController(ILogger<AuthController> logger, IAuthService authService)
+    public AuthController(ILogger<AuthController> logger, IAuthService authService, ITokenService tokenService)
     {
         _logger = logger;
         _authService = authService;
+        _tokenService = tokenService;
     }
 
 
@@ -37,6 +43,12 @@ public class AuthController : Controller
         if (authenticated is not null && authenticated.IsSuccess)
         {
             var result = JsonSerializer.Deserialize<UserAuthResponseDto>(JsonSerializer.Serialize(authenticated.Result), JsonSerializerConfig.DefaultOptions);
+            if (result is not null)
+            {
+                // do not forget to set up cookie auth in program.cs
+                await SignInUser(result.Token);
+                _tokenService.SetToken(result.Token);
+            }
             return RedirectToAction(nameof(Index), "Home");
         }
         else
@@ -91,8 +103,9 @@ public class AuthController : Controller
     [HttpGet]
     public async Task<IActionResult> Logout()
     {
-        await Task.CompletedTask;
-        return View();
+        await HttpContext.SignOutAsync();
+        _tokenService.ClearToken();
+        return RedirectToAction(nameof(Login), "Auth");
     }
 
 
@@ -100,5 +113,24 @@ public class AuthController : Controller
     public IActionResult Error()
     {
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+    }
+
+    private async Task SignInUser(string token)
+    {
+        // Check the validity of the token and return success or a failure
+        // Note MUST set "MapInboundClaims" to true when creating JsonWebTokenHandler
+        // so that claims are populated properly and that authorization will work
+        // properly in the controllers. I.E the User object will be populated properly
+        // package: Microsoft.IdentityModel.JsonWebTokens
+        var jwtTokenHandler = new JsonWebTokenHandler { MapInboundClaims = true };
+        var jwtToken = jwtTokenHandler.ReadJsonWebToken(token);
+
+        var claims = jwtToken.Claims.Select(x => new Claim(x.Type, x.Value)).ToList();
+
+        // Need to specifically add this claimtype to populate User.Identity.Name on the front end
+        claims.Add(new Claim(ClaimTypes.Name, jwtToken.Claims.First(x => x.Type == "name").Value));
+
+        var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme));
+        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
     }
 }

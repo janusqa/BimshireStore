@@ -12,6 +12,10 @@ Auth API (additional packages)
 ===
 - dotnet add BimshireStore.Services.AuthAPI package Microsoft.AspNetCore.Identity.EntityFrameworkCore
 
+UI (additional packages)
+===
+- dotnet add BimshireStore package Microsoft.IdentityModel.JsonWebTokens
+
 Auth API (additional config)
 - add "app.UseAuthentication()" above "app.UseAuthorization()" in program.cs;
 - add Identity to services

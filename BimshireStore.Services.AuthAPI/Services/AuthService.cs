@@ -89,7 +89,7 @@ namespace BimshireStore.Services.AuthAPI.Services
             [
                 new (JwtRegisteredClaimNames.Sub, user.Id ?? throw new InvalidOperationException()),
                 new (JwtRegisteredClaimNames.Email, user.Email ?? throw new InvalidOperationException()),
-                new (JwtRegisteredClaimNames.Name, user.UserName ?? throw new InvalidOperationException())
+                new (JwtRegisteredClaimNames.Name, user.UserName ?? throw new InvalidOperationException()),
             ]);
             // add additional claims createad above too
             claimsIdentity.AddClaims(userClaims);

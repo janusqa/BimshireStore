@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace BimshireStore.Models.Dto
 {
 
@@ -12,9 +14,13 @@ namespace BimshireStore.Models.Dto
 
     public record UserRegisterRequestDto
     {
+        [Required]
         public required string UserName { get; set; }
+        [Required]
         public string? Name { get; set; }
+        [Required]
         public string? PhoneNumber { get; set; }
+        [Required]
         public required string Password { get; set; }
         public string? Role { get; set; }
     }
@@ -27,7 +33,9 @@ namespace BimshireStore.Models.Dto
 
     public record UserAuthResponseDto
     {
+        [Required]
         public required UserDto User { get; set; }
+        [Required]
         public required string Token { get; set; }
     }
 
