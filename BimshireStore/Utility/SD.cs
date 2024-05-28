@@ -19,6 +19,8 @@ namespace BimshireStore.Utility
             DELETE
         }
 
+        public const string TokenCookie = "BimshireStoreJwtToken";
+
         public static string? CouponApiBaseAddress { get; set; }
         public static string? AuthApiBaseAddress { get; set; }
 

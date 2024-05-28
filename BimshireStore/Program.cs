@@ -11,6 +11,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<ICouponService, CouponService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddSingleton<IHttpRequestMessageBuilder, HttpRequestMessageBuilder>();
+builder.Services.AddSingleton<ITokenService, TokenService>();
 
 // API URIs
 SD.CouponApiBaseAddress = builder.Configuration["ServiceUris:CouponApi"]
