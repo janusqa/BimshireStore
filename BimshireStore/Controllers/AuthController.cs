@@ -32,16 +32,18 @@ public class AuthController : Controller
     [HttpPost]
     public async Task<IActionResult> Login(UserLoginRequestDto request)
     {
-        var response = await _authService.LoginAsync(request);
+        var authenticated = await _authService.LoginAsync(request);
 
-        if (response is not null && response.IsSuccess)
+        if (authenticated is not null && authenticated.IsSuccess)
         {
-            var result = JsonSerializer.Deserialize<UserAuthResponseDto>(JsonSerializer.Serialize(response.Result), JsonSerializerConfig.DefaultOptions);
-            return View(result);
+            var result = JsonSerializer.Deserialize<UserAuthResponseDto>(JsonSerializer.Serialize(authenticated.Result), JsonSerializerConfig.DefaultOptions);
+            return RedirectToAction(nameof(Index), "Home");
         }
         else
         {
-            TempData["error"] = string.Join(" | ", response?.ErrorMessages ?? ["Oops, Something went wrong"]);
+            var errorMessage = string.Join(" | ", authenticated?.ErrorMessages ?? ["Login failed"]);
+            ModelState.AddModelError("CustomError", errorMessage);
+            TempData["error"] = errorMessage;
             return View(request);
         }
     }
@@ -53,7 +55,6 @@ public class AuthController : Controller
             new SelectListItem { Text = SD.Role_Admin, Value=Role_Admin},
             new SelectListItem { Text = SD.Role_Customer, Value=Role_Customer}
         };
-
         ViewBag.Roles = roles;
 
         await Task.CompletedTask;
@@ -63,17 +64,28 @@ public class AuthController : Controller
     [HttpPost]
     public async Task<IActionResult> Register(UserRegisterRequestDto request)
     {
-        var response = await _authService.RegisterAsync(request);
+        var roles = new List<SelectListItem> {
+            new SelectListItem { Text = SD.Role_Admin, Value=Role_Admin},
+            new SelectListItem { Text = SD.Role_Customer, Value=Role_Customer}
+        };
+        ViewBag.Roles = roles;
 
-        if (response is not null && response.IsSuccess)
+        var registerUser = await _authService.RegisterAsync(request);
+
+        if (registerUser is not null && registerUser.IsSuccess)
         {
-            return View();
+            if (string.IsNullOrWhiteSpace(request.Role)) request.Role = SD.Role_Customer;
+            var assignUserToRole = await _authService.AssignRoleAsync(request);
+            if (assignUserToRole is not null && registerUser.IsSuccess)
+            {
+                TempData["success"] = "Registration successful";
+                return RedirectToAction(nameof(Login));
+            }
         }
-        else
-        {
-            TempData["error"] = string.Join(" | ", response?.ErrorMessages ?? ["Oops, Something went wrong"]);
-            return View(request);
-        }
+
+        TempData["error"] = string.Join(" | ", registerUser?.ErrorMessages ?? ["Registration failed"]);
+        return View(request);
+
     }
 
     [HttpGet]
