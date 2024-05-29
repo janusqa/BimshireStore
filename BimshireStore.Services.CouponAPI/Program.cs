@@ -70,7 +70,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(x =>
 {
     x.SwaggerDoc("v1", new OpenApiInfo { Title = "CouponAPI", Version = "v1", });
-    x.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    x.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme
     {
         In = ParameterLocation.Header,
         Description = "Please enter a valid token",
@@ -85,7 +85,7 @@ builder.Services.AddSwaggerGen(x =>
             new OpenApiSecurityScheme {
                 Reference= new OpenApiReference {
                     Type=ReferenceType.SecurityScheme,
-                    Id="Bearer"
+                    Id=JwtBearerDefaults.AuthenticationScheme
                 }
             },
             Array.Empty<string>()

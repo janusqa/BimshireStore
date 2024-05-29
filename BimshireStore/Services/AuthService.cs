@@ -4,16 +4,18 @@ using BimshireStore.Utility;
 
 namespace BimshireStore.Services
 {
-    public class AuthService : BaseService, IAuthService
+    public class AuthService : IAuthService
     {
-        public AuthService(IHttpClientFactory hcf, IHttpRequestMessageBuilder mb) : base(hcf, mb)
-        {
+        private readonly IBaseService _bs;
 
+        public AuthService(IBaseService bs)
+        {
+            _bs = bs;
         }
 
         public async Task<ApiResponse?> AssignRoleAsync(UserRegisterRequestDto request)
         {
-            return await SendAsync(new ApiRequest
+            return await _bs.SendAsync(new ApiRequest
             {
                 ApiMethod = SD.ApiMethod.POST,
                 Url = $"{SD.AuthApiBaseAddress}api/auth/assign-role",
@@ -23,7 +25,7 @@ namespace BimshireStore.Services
 
         public async Task<ApiResponse?> LoginAsync(UserLoginRequestDto request)
         {
-            return await SendAsync(new ApiRequest
+            return await _bs.SendAsync(new ApiRequest
             {
                 ApiMethod = SD.ApiMethod.POST,
                 Url = $"{SD.AuthApiBaseAddress}api/auth/login",
@@ -33,7 +35,7 @@ namespace BimshireStore.Services
 
         public async Task<ApiResponse?> RegisterAsync(UserRegisterRequestDto request)
         {
-            return await SendAsync(new ApiRequest
+            return await _bs.SendAsync(new ApiRequest
             {
                 ApiMethod = SD.ApiMethod.POST,
                 Url = $"{SD.AuthApiBaseAddress}api/auth/register",

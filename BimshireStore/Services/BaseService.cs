@@ -1,4 +1,5 @@
 using System.Net;
+using System.Net.Http.Headers;
 using System.Text.Json;
 using BimshireStore.Models.Dto;
 using BimshireStore.Services.IService;
@@ -10,17 +11,27 @@ namespace BimshireStore.Services
     {
         private readonly IHttpClientFactory _hcf;
         private readonly IHttpRequestMessageBuilder _mb;
+        private readonly ITokenService _ts;
 
-
-        public BaseService(IHttpClientFactory hcf, IHttpRequestMessageBuilder mb)
+        public BaseService(IHttpClientFactory hcf, IHttpRequestMessageBuilder mb, ITokenService ts)
         {
             _hcf = hcf;
             _mb = mb;
+            _ts = ts;
         }
 
-        public async Task<ApiResponse?> SendAsync(ApiRequest request)
+        public async Task<ApiResponse?> SendAsync(ApiRequest request, bool withCredentials)
         {
             HttpClient client = _hcf.CreateClient("BimshireStoreApi");
+
+            if (withCredentials)
+            {
+                var token = _ts.GetToken();
+                if (token is not null)
+                {
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                }
+            }
 
             var messageFactory = () => _mb.Build(request);
 
@@ -28,35 +39,21 @@ namespace BimshireStore.Services
             {
                 HttpResponseMessage? responseMessage = await client.SendAsync(messageFactory());
 
-                var jsonResponse = await responseMessage.Content.ReadAsStringAsync();
-
-                var apiResponse = JsonSerializer.Deserialize<ApiResponse>(jsonResponse, JsonSerializerConfig.DefaultOptions);
-
-                if (!responseMessage.IsSuccessStatusCode)
+                switch (responseMessage.StatusCode)
                 {
-                    var errorMessage = responseMessage.StatusCode switch
-                    {
-                        HttpStatusCode.NotFound => "Not Found",
-                        HttpStatusCode.BadRequest => string.Join(",", apiResponse?.ErrorMessages ?? ["Bad Request"]),
-                        HttpStatusCode.Forbidden => "Access Denied",
-                        HttpStatusCode.Unauthorized => "Unauthorized",
-                        HttpStatusCode.InternalServerError => string.Join(",", apiResponse?.ErrorMessages ?? ["Internal Server Error"]),
-                        _ => string.Join(",", apiResponse?.ErrorMessages ?? ["Oops, something went wrong"])
-                    };
-
-                    throw new Exception(errorMessage);
+                    case HttpStatusCode.NotFound:
+                        return new ApiResponse { IsSuccess = false, ErrorMessages = ["Not Found"] };
+                    case HttpStatusCode.Forbidden:
+                        return new ApiResponse { IsSuccess = false, ErrorMessages = ["Access Denied"] };
+                    case HttpStatusCode.Unauthorized:
+                        return new ApiResponse { IsSuccess = false, ErrorMessages = ["Unauthorized"] };
+                    case HttpStatusCode.InternalServerError:
+                        return new ApiResponse { IsSuccess = false, ErrorMessages = ["Internal Server Error"] };
+                    default:
+                        var jsonResponse = await responseMessage.Content.ReadAsStringAsync();
+                        var apiResponse = JsonSerializer.Deserialize<ApiResponse>(jsonResponse, JsonSerializerConfig.DefaultOptions);
+                        return apiResponse;
                 }
-
-                if (apiResponse is not null)
-                {
-                    apiResponse.StatusCode = responseMessage.StatusCode;
-                    return apiResponse;
-                }
-                else
-                {
-                    throw new Exception("Oops something went wrong");
-                }
-
             }
             catch (Exception ex)
             {

@@ -2,7 +2,7 @@ using BimshireStore.Models.Dto;
 
 namespace BimshireStore.Services.IService
 {
-    public interface ICouponService : IBaseService
+    public interface ICouponService
     {
         Task<ApiResponse?> GetAllCouponsAsync();
         Task<ApiResponse?> GetCouponByCodeAsync(string code);

@@ -4,6 +4,6 @@ namespace BimshireStore.Services.IService
 {
     public interface IBaseService
     {
-        Task<ApiResponse?> SendAsync(ApiRequest request);
+        Task<ApiResponse?> SendAsync(ApiRequest request, bool withCredentials = true);
     }
 }
