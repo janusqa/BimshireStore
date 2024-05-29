@@ -92,7 +92,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(x =>
 {
-    x.SwaggerDoc("v1", new OpenApiInfo { Title = "CouponAPI", Version = "v1", });
+    x.SwaggerDoc("v1", new OpenApiInfo { Title = "AuthAPI", Version = "v1", });
     x.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme
     {
         In = ParameterLocation.Header,

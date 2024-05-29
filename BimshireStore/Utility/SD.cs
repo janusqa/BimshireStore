@@ -23,6 +23,7 @@ namespace BimshireStore.Utility
 
         public static string? CouponApiBaseAddress { get; set; }
         public static string? AuthApiBaseAddress { get; set; }
+        public static string? ProductApiBaseAddress { get; set; }
 
         // Role Constants
         public const string Role_Customer = "Customer";

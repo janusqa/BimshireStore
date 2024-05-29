@@ -2,13 +2,12 @@ using BimshireStore.Models.Dto;
 
 namespace BimshireStore.Services.IService
 {
-    public interface ICouponService
+    public interface IProductService
     {
         Task<ApiResponse?> GetAllAsync();
-        Task<ApiResponse?> GetByCodeAsync(string code);
         Task<ApiResponse?> GetByIdAsync(int id);
-        Task<ApiResponse?> CreateAsync(CouponDto coupon);
-        Task<ApiResponse?> UpdateAsync(CouponDto coupon);
+        Task<ApiResponse?> CreateAsync(ProductDto product);
+        Task<ApiResponse?> UpdateAsync(ProductDto product);
         Task<ApiResponse?> DeleteAsync(int id);
     }
 }

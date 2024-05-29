@@ -4,11 +4,11 @@ using BimshireStore.Utility;
 
 namespace BimshireStore.Services
 {
-    public class CouponService : ICouponService
+    public class ProductService : IProductService
     {
         private readonly IBaseService _bs;
 
-        public CouponService(IBaseService bs)
+        public ProductService(IBaseService bs)
         {
             _bs = bs;
         }
@@ -18,16 +18,7 @@ namespace BimshireStore.Services
             return await _bs.SendAsync(new ApiRequest
             {
                 ApiMethod = SD.ApiMethod.GET,
-                Url = $"{SD.CouponApiBaseAddress}api/coupons"
-            });
-        }
-
-        public async Task<ApiResponse?> GetByCodeAsync(string code)
-        {
-            return await _bs.SendAsync(new ApiRequest
-            {
-                ApiMethod = SD.ApiMethod.GET,
-                Url = $"{SD.CouponApiBaseAddress}api/coupons/code/{code}"
+                Url = $"{SD.CouponApiBaseAddress}api/products"
             });
         }
 
@@ -36,27 +27,27 @@ namespace BimshireStore.Services
             return await _bs.SendAsync(new ApiRequest
             {
                 ApiMethod = SD.ApiMethod.GET,
-                Url = $"{SD.CouponApiBaseAddress}api/coupons/{id}"
+                Url = $"{SD.CouponApiBaseAddress}api/products/{id}"
             });
         }
 
-        public async Task<ApiResponse?> CreateAsync(CouponDto coupon)
+        public async Task<ApiResponse?> CreateAsync(ProductDto product)
         {
             return await _bs.SendAsync(new ApiRequest
             {
                 ApiMethod = SD.ApiMethod.POST,
-                Url = $"{SD.CouponApiBaseAddress}api/coupons",
-                Data = coupon
+                Url = $"{SD.CouponApiBaseAddress}api/products",
+                Data = product
             });
         }
 
-        public async Task<ApiResponse?> UpdateAsync(CouponDto coupon)
+        public async Task<ApiResponse?> UpdateAsync(ProductDto product)
         {
             return await _bs.SendAsync(new ApiRequest
             {
                 ApiMethod = SD.ApiMethod.PUT,
-                Url = $"{SD.CouponApiBaseAddress}api/coupons",
-                Data = coupon
+                Url = $"{SD.CouponApiBaseAddress}api/products",
+                Data = product
             });
         }
 
@@ -65,9 +56,8 @@ namespace BimshireStore.Services
             return await _bs.SendAsync(new ApiRequest
             {
                 ApiMethod = SD.ApiMethod.DELETE,
-                Url = $"{SD.CouponApiBaseAddress}api/coupons/{id}"
+                Url = $"{SD.CouponApiBaseAddress}api/products/{id}"
             });
         }
-
     }
 }

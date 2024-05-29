@@ -34,6 +34,8 @@ SD.CouponApiBaseAddress = builder.Configuration["ServiceUris:CouponApi"]
     ?? throw new InvalidOperationException("Invalid CouponAPI base Address");
 SD.AuthApiBaseAddress = builder.Configuration["ServiceUris:AuthApi"]
     ?? throw new InvalidOperationException("Invalid AuthAPI base Address");
+SD.ProductApiBaseAddress = builder.Configuration["ServiceUris:ProductApi"]
+    ?? throw new InvalidOperationException("Invalid ProductAPI base Address");
 
 // HTTPClient
 builder.Services.AddHttpContextAccessor();
