@@ -13,7 +13,8 @@ namespace BimshireStore.Services.ShoppingCartAPI.Data
         }
 
         public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
-        // public DbSet<ShoppingCart> ShoppingCarts { get; set; }
+        public DbSet<CartHeader> CartHeaders { get; set; }
+        public DbSet<CartDetail> CartDetails { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
