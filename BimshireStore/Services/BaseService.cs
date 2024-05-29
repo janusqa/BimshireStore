@@ -36,10 +36,10 @@ namespace BimshireStore.Services
                 {
                     var errorMessage = responseMessage.StatusCode switch
                     {
-                        HttpStatusCode.NotFound => string.Join(",", apiResponse?.ErrorMessages ?? ["Not Found"]),
+                        HttpStatusCode.NotFound => "Not Found",
                         HttpStatusCode.BadRequest => string.Join(",", apiResponse?.ErrorMessages ?? ["Bad Request"]),
-                        HttpStatusCode.Forbidden => string.Join(",", apiResponse?.ErrorMessages ?? ["Access denied"]),
-                        HttpStatusCode.Unauthorized => string.Join(",", apiResponse?.ErrorMessages ?? ["Unauthorized"]),
+                        HttpStatusCode.Forbidden => "Access Denied",
+                        HttpStatusCode.Unauthorized => "Unauthorized",
                         HttpStatusCode.InternalServerError => string.Join(",", apiResponse?.ErrorMessages ?? ["Internal Server Error"]),
                         _ => string.Join(",", apiResponse?.ErrorMessages ?? ["Oops, something went wrong"])
                     };

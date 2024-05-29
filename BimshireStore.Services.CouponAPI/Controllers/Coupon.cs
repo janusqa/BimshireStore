@@ -2,11 +2,13 @@ using BimshireStore.Services.CouponAPI.Data;
 using BimshireStore.Services.CouponAPI.Models;
 using BimshireStore.Services.CouponAPI.Models.Dto;
 using BimshireStore.Services.CouponAPI.Models.Extensions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace BimshireStore.Services.CouponAPI.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/coupons")]  // hard coded route name
     public class CouponController : ControllerBase

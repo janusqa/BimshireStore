@@ -66,7 +66,8 @@
 /Program.cs
 
     var jwtSettings = new JwtSettings();
-    builder.Configuration.Bind(nameof(JwtSettings), jwtSettings);
+    // builder.Configuration.Bind(nameof(JwtSettings), jwtSettings);
+    builder.Configuration.GetSection(nameof(JwtSettings)).Bind(jwtSettings);
 
     var jwtSection = builder.Configuration.GetSecton(nameof(JwtSettings));
     builder.Services.Configure<JwtSettings>(jwtSection);

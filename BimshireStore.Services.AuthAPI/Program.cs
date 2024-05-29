@@ -30,7 +30,8 @@ builder.Services.AddDataProtection()
 
 // Authentication - Bearer Token
 var jwtSettings = new JwtSettings();
-builder.Configuration.Bind(nameof(JwtSettings), jwtSettings);
+// builder.Configuration.Bind(nameof(JwtSettings), jwtSettings);
+builder.Configuration.GetSection(nameof(JwtSettings)).Bind(jwtSettings);
 
 var jwtSection = builder.Configuration.GetSection(nameof(JwtSettings));
 builder.Services.Configure<JwtSettings>(jwtSection);
@@ -43,10 +44,10 @@ builder.Services
          x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 
      })
-     .AddJwtBearer(jwt =>
+     .AddJwtBearer(x =>
      {
-         jwt.SaveToken = true;
-         jwt.TokenValidationParameters = new TokenValidationParameters
+         x.SaveToken = true;
+         x.TokenValidationParameters = new TokenValidationParameters
          {
              ValidateIssuerSigningKey = true,
              IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtSettings.SigningKey ?? throw new InvalidOperationException())),
@@ -56,9 +57,8 @@ builder.Services
              RequireExpirationTime = false,
              ValidateLifetime = true
          };
-         jwt.Audience = jwtSettings.Audiences?[0];
-         jwt.ClaimsIssuer = jwtSettings.Issuer;
-
+         x.Audience = jwtSettings.Audiences?[0];
+         x.ClaimsIssuer = jwtSettings.Issuer;
      });
 
 // builder.Services.AddAuthentication().AddBearerToken(IdentityConstants.BearerScheme);
