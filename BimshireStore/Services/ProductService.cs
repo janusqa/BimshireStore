@@ -18,7 +18,7 @@ namespace BimshireStore.Services
             return await _bs.SendAsync(new ApiRequest
             {
                 ApiMethod = SD.ApiMethod.GET,
-                Url = $"{SD.CouponApiBaseAddress}api/products"
+                Url = $"{SD.ProductApiBaseAddress}api/products"
             });
         }
 
@@ -27,7 +27,7 @@ namespace BimshireStore.Services
             return await _bs.SendAsync(new ApiRequest
             {
                 ApiMethod = SD.ApiMethod.GET,
-                Url = $"{SD.CouponApiBaseAddress}api/products/{id}"
+                Url = $"{SD.ProductApiBaseAddress}api/products/{id}"
             });
         }
 
@@ -36,7 +36,7 @@ namespace BimshireStore.Services
             return await _bs.SendAsync(new ApiRequest
             {
                 ApiMethod = SD.ApiMethod.POST,
-                Url = $"{SD.CouponApiBaseAddress}api/products",
+                Url = $"{SD.ProductApiBaseAddress}api/products",
                 Data = product
             });
         }
@@ -46,7 +46,7 @@ namespace BimshireStore.Services
             return await _bs.SendAsync(new ApiRequest
             {
                 ApiMethod = SD.ApiMethod.PUT,
-                Url = $"{SD.CouponApiBaseAddress}api/products",
+                Url = $"{SD.ProductApiBaseAddress}api/products",
                 Data = product
             });
         }
@@ -56,7 +56,7 @@ namespace BimshireStore.Services
             return await _bs.SendAsync(new ApiRequest
             {
                 ApiMethod = SD.ApiMethod.DELETE,
-                Url = $"{SD.CouponApiBaseAddress}api/products/{id}"
+                Url = $"{SD.ProductApiBaseAddress}api/products/{id}"
             });
         }
     }
