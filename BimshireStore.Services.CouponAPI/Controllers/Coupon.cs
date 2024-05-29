@@ -2,6 +2,7 @@ using BimshireStore.Services.CouponAPI.Data;
 using BimshireStore.Services.CouponAPI.Models;
 using BimshireStore.Services.CouponAPI.Models.Dto;
 using BimshireStore.Services.CouponAPI.Models.Extensions;
+using BimshireStore.Services.CouponAPI.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -128,6 +129,7 @@ namespace BimshireStore.Services.CouponAPI.Controllers
             }
         }
 
+        [Authorize(Roles = $"{SD.Role_Admin}")]
         [HttpPost("")]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -171,6 +173,7 @@ namespace BimshireStore.Services.CouponAPI.Controllers
             }
         }
 
+        [Authorize(Roles = $"{SD.Role_Admin}")]
         [HttpPut("")]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -215,6 +218,7 @@ namespace BimshireStore.Services.CouponAPI.Controllers
             }
         }
 
+        [Authorize(Roles = $"{SD.Role_Admin}")]
         [HttpDelete("{Id:int}")]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
