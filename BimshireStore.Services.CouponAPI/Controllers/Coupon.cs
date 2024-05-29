@@ -70,13 +70,20 @@ namespace BimshireStore.Services.CouponAPI.Controllers
             {
                 var coupon = (await _db.Coupons.FirstOrDefaultAsync(x => x.CouponId == Id))?.ToDto();
 
-                return Ok(
-                    new ApiResponse
-                    {
-                        IsSuccess = true,
-                        Result = coupon,
-                        StatusCode = System.Net.HttpStatusCode.OK
-                    });
+                if (coupon is not null)
+                {
+                    return Ok(
+                        new ApiResponse
+                        {
+                            IsSuccess = true,
+                            Result = coupon,
+                            StatusCode = System.Net.HttpStatusCode.OK
+                        });
+                }
+                else
+                {
+                    return NotFound(new ApiResponse { IsSuccess = false, StatusCode = System.Net.HttpStatusCode.NotFound });
+                }
             }
             catch (Exception ex)
             {
@@ -106,13 +113,20 @@ namespace BimshireStore.Services.CouponAPI.Controllers
             {
                 var coupon = (await _db.Coupons.FirstOrDefaultAsync(x => !string.IsNullOrWhiteSpace(x.CouponCode) && x.CouponCode.ToLower() == code.ToLower()))?.ToDto();
 
-                return Ok(
-                    new ApiResponse
-                    {
-                        IsSuccess = true,
-                        Result = coupon,
-                        StatusCode = System.Net.HttpStatusCode.OK
-                    });
+                if (coupon is not null)
+                {
+                    return Ok(
+                        new ApiResponse
+                        {
+                            IsSuccess = true,
+                            Result = coupon,
+                            StatusCode = System.Net.HttpStatusCode.OK
+                        });
+                }
+                else
+                {
+                    return NotFound(new ApiResponse { IsSuccess = false, StatusCode = System.Net.HttpStatusCode.NotFound });
+                }
             }
             catch (Exception ex)
             {
@@ -231,6 +245,7 @@ namespace BimshireStore.Services.CouponAPI.Controllers
             try
             {
                 var coupon = await _db.Coupons.FirstOrDefaultAsync(x => x.CouponId == Id);
+
                 if (coupon is not null)
                 {
                     _db.Coupons.Remove(coupon);

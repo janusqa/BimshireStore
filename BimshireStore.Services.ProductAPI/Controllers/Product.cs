@@ -9,7 +9,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BimshireStore.Services.ProductAPI.Controllers
 {
-    [Authorize]
     [ApiController]
     [Route("api/products")]  // hard coded route name
     public class ProductController : ControllerBase
@@ -70,13 +69,20 @@ namespace BimshireStore.Services.ProductAPI.Controllers
             {
                 var product = (await _db.Products.FirstOrDefaultAsync(x => x.ProductId == Id))?.ToDto();
 
-                return Ok(
-                    new ApiResponse
-                    {
-                        IsSuccess = true,
-                        Result = product,
-                        StatusCode = System.Net.HttpStatusCode.OK
-                    });
+                if (product is not null)
+                {
+                    return Ok(
+                        new ApiResponse
+                        {
+                            IsSuccess = true,
+                            Result = product,
+                            StatusCode = System.Net.HttpStatusCode.OK
+                        });
+                }
+                else
+                {
+                    return NotFound(new ApiResponse { IsSuccess = false, StatusCode = System.Net.HttpStatusCode.NotFound });
+                }
             }
             catch (Exception ex)
             {
@@ -198,10 +204,10 @@ namespace BimshireStore.Services.ProductAPI.Controllers
         {
             try
             {
-                var Product = await _db.Products.FirstOrDefaultAsync(x => x.ProductId == Id);
-                if (Product is not null)
+                var product = await _db.Products.FirstOrDefaultAsync(x => x.ProductId == Id);
+                if (product is not null)
                 {
-                    _db.Products.Remove(Product);
+                    _db.Products.Remove(product);
                     await _db.SaveChangesAsync();
 
 
@@ -209,7 +215,7 @@ namespace BimshireStore.Services.ProductAPI.Controllers
                         new ApiResponse
                         {
                             IsSuccess = true,
-                            Result = Product.ToDto(),
+                            Result = product.ToDto(),
                             StatusCode = System.Net.HttpStatusCode.OK
                         });
                 }
