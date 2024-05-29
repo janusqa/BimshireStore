@@ -5,6 +5,7 @@ using BimshireStore.Services.IService;
 using System.Text.Json;
 using BimshireStore.Models.Dto;
 using static BimshireStore.Utility.SD;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BimshireStore.Controllers;
 
@@ -35,11 +36,10 @@ public class HomeController : Controller
         }
     }
 
+    [Authorize]
     public async Task<IActionResult> ProductDetails(int productId)
     {
         var response = await _productService.GetByIdAsync(productId);
-
-        Console.WriteLine(response);
 
         if (response is not null && response.IsSuccess)
         {

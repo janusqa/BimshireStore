@@ -37,6 +37,8 @@ SD.AuthApiBaseAddress = builder.Configuration["ServiceUris:AuthApi"]
     ?? throw new InvalidOperationException("Invalid AuthAPI base Address");
 SD.ProductApiBaseAddress = builder.Configuration["ServiceUris:ProductApi"]
     ?? throw new InvalidOperationException("Invalid ProductAPI base Address");
+SD.ShoppingCartApiBaseAddress = builder.Configuration["ServiceUris:ShoppingCartApi"]
+    ?? throw new InvalidOperationException("Invalid ShoppingCartAPI base Address");
 
 // HTTPClient
 builder.Services.AddHttpContextAccessor();
