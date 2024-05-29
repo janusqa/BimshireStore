@@ -67,7 +67,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(x =>
 {
-    x.SwaggerDoc("v1", new OpenApiInfo { Title = "ProductAPI", Version = "v1", });
+    x.SwaggerDoc("v1", new OpenApiInfo { Title = "ShoppingCartAPI", Version = "v1", });
     x.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme
     {
         In = ParameterLocation.Header,

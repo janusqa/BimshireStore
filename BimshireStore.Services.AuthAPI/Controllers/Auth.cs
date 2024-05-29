@@ -1,7 +1,6 @@
 using System.Globalization;
 using BimshireStore.Services.AuthAPI.Data;
 using BimshireStore.Services.AuthAPI.Models.Dto;
-using BimshireStore.Services.AuthAPI.Models.Extensions;
 using BimshireStore.Services.AuthAPI.Services.IService;
 using Microsoft.AspNetCore.Mvc;
 

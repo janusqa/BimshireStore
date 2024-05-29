@@ -21,7 +21,7 @@ namespace BimshireStore.Services.ShoppingCartAPI.Models.Dto
 
     public record CartDto
     {
-        public CartHeaderDto? CartHeader { get; set; }
+        public required CartHeaderDto CartHeader { get; set; }
         public IEnumerable<CartDetailDto>? CartDetail { get; set; }
     }
 }
