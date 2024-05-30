@@ -1,11 +1,11 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text.Json;
-using BimshireStore.Models.Dto;
-using BimshireStore.Services.IService;
-using static BimshireStore.Utility.SD;
+using BimshireStore.Services.ShoppingCartAPI.Models.Dto;
+using BimshireStore.Services.ShoppingCartAPI.Services.IService;
+using static BimshireStore.Services.ShoppingCartAPI.Utility.SD;
 
-namespace BimshireStore.Services
+namespace BimshireStore.Services.ShoppingCartAPI.Services
 {
     public class BaseService : IBaseService
     {

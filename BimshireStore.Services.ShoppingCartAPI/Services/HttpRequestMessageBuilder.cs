@@ -1,13 +1,13 @@
 
 using System.Text;
 using System.Text.Json;
-using BimshireStore.Models.Dto;
-using BimshireStore.Services.IService;
-using BimshireStore.Utility;
+using BimshireStore.Services.ShoppingCartAPI.Utility;
+using BimshireStore.Services.ShoppingCartAPI.Models.Dto;
+using BimshireStore.Services.ShoppingCartAPI.Services.IService;
 using Microsoft.AspNetCore.Components.Forms;
 
 
-namespace BimshireStore.Services
+namespace BimshireStore.Services.ShoppingCartAPI.Services
 {
     public class HttpRequestMessageBuilder : IHttpRequestMessageBuilder
     {

@@ -1,7 +1,6 @@
+using static BimshireStore.Services.ShoppingCartAPI.Utility.SD;
 
-using static BimshireStore.Utility.SD;
-
-namespace BimshireStore.Models.Dto
+namespace BimshireStore.Services.ShoppingCartAPI.Models.Dto
 {
     public record ApiRequest
     {

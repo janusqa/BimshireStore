@@ -1,6 +1,9 @@
 using System.Text;
 using BimshireStore.Services.ShoppingCartAPI.Data;
 using BimshireStore.Services.ShoppingCartAPI.Models;
+using BimshireStore.Services.ShoppingCartAPI.Services;
+using BimshireStore.Services.ShoppingCartAPI.Services.IService;
+using BimshireStore.Services.ShoppingCartAPI.Utility;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
@@ -61,6 +64,27 @@ builder.Services.AddAuthorizationBuilder();
 
 // Other Services
 builder.Services.AddScoped<IDbInitializer, DbInitializer>();
+builder.Services.AddScoped<IHttpRequestMessageBuilder, HttpRequestMessageBuilder>();
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IBaseService, BaseService>();
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<ICouponService, CouponService>();
+
+// API URIs
+SD.CouponApiBaseAddress = builder.Configuration["ServiceUris:CouponApi"]
+    ?? throw new InvalidOperationException("Invalid CouponAPI base Address");
+SD.AuthApiBaseAddress = builder.Configuration["ServiceUris:AuthApi"]
+    ?? throw new InvalidOperationException("Invalid AuthAPI base Address");
+SD.ProductApiBaseAddress = builder.Configuration["ServiceUris:ProductApi"]
+    ?? throw new InvalidOperationException("Invalid ProductAPI base Address");
+
+// HTTPClient
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddHttpClient("BimshireStore")
+.ConfigurePrimaryHttpMessageHandler(() =>
+    // !!! DISABLE IN PROD. THIS IS TO BYPASS CHECKING SSL CERT AUTH FOR DEV PURPOSES !!!
+    new HttpClientHandler { ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator }
+);
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

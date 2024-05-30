@@ -1,4 +1,3 @@
-using BimshireStore.Service;
 using BimshireStore.Services;
 using BimshireStore.Services.IService;
 using BimshireStore.Utility;
@@ -42,7 +41,7 @@ SD.ShoppingCartApiBaseAddress = builder.Configuration["ServiceUris:ShoppingCartA
 
 // HTTPClient
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddHttpClient("BimshireStoreApi")
+builder.Services.AddHttpClient("BimshireStore")
 .ConfigurePrimaryHttpMessageHandler(() =>
     // !!! DISABLE IN PROD. THIS IS TO BYPASS CHECKING SSL CERT AUTH FOR DEV PURPOSES !!!
     new HttpClientHandler { ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator }
