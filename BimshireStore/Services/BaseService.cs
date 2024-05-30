@@ -42,13 +42,13 @@ namespace BimshireStore.Services
                 switch (responseMessage.StatusCode)
                 {
                     case HttpStatusCode.NotFound:
-                        return new ApiResponse { IsSuccess = false, ErrorMessages = ["Not Found"] };
+                        return new ApiResponse { IsSuccess = false, ErrorMessages = ["Not Found"], StatusCode = responseMessage.StatusCode };
                     case HttpStatusCode.Forbidden:
-                        return new ApiResponse { IsSuccess = false, ErrorMessages = ["Access Denied"] };
+                        return new ApiResponse { IsSuccess = false, ErrorMessages = ["Access Denied"], StatusCode = responseMessage.StatusCode };
                     case HttpStatusCode.Unauthorized:
-                        return new ApiResponse { IsSuccess = false, ErrorMessages = ["Unauthorized"] };
+                        return new ApiResponse { IsSuccess = false, ErrorMessages = ["Unauthorized"], StatusCode = responseMessage.StatusCode };
                     case HttpStatusCode.InternalServerError:
-                        return new ApiResponse { IsSuccess = false, ErrorMessages = ["Internal Server Error"] };
+                        return new ApiResponse { IsSuccess = false, ErrorMessages = ["Internal Server Error"], StatusCode = responseMessage.StatusCode };
                     default:
                         var jsonResponse = await responseMessage.Content.ReadAsStringAsync();
                         var apiResponse = JsonSerializer.Deserialize<ApiResponse>(jsonResponse, JsonSerializerConfig.DefaultOptions);

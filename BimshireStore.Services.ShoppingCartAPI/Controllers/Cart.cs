@@ -28,7 +28,7 @@ namespace BimshireStore.Services.ShoppingCartAPI.Controllers
             _cs = cs;
         }
 
-        [HttpGet("get-cart/{userId}")]
+        [HttpGet("{userId}")]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -212,11 +212,11 @@ namespace BimshireStore.Services.ShoppingCartAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<ApiResponse>> RemoveItem([FromBody] int cartDetailsId)
+        public async Task<ActionResult<ApiResponse>> RemoveItem([FromBody] int cartDetailId)
         {
             try
             {
-                var cartDetailsFromDb = await _db.CartDetails.AsNoTracking().FirstOrDefaultAsync(x => x.CartDetailId == cartDetailsId);
+                var cartDetailsFromDb = await _db.CartDetails.AsNoTracking().FirstOrDefaultAsync(x => x.CartDetailId == cartDetailId);
                 if (cartDetailsFromDb is not null)
                 {
                     var itemCount = _db.CartDetails.AsNoTracking().Where(x => x.CartHeaderId == cartDetailsFromDb.CartHeaderId).Count();

@@ -6,6 +6,8 @@ using System.Text.Json;
 using BimshireStore.Models.Dto;
 using static BimshireStore.Utility.SD;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+using Microsoft.IdentityModel.JsonWebTokens;
 
 namespace BimshireStore.Controllers;
 
@@ -13,11 +15,13 @@ public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
     private readonly IProductService _productService;
+    private readonly ICartService _cartService;
 
-    public HomeController(ILogger<HomeController> logger, IProductService productService)
+    public HomeController(ILogger<HomeController> logger, IProductService productService, ICartService cartService)
     {
         _logger = logger;
         _productService = productService;
+        _cartService = cartService;
     }
 
     public async Task<IActionResult> Index()
@@ -50,6 +54,32 @@ public class HomeController : Controller
         {
             TempData["error"] = string.Join(" | ", response?.ErrorMessages ?? ["Oops, Something went wrong"]);
             return RedirectToAction(nameof(Index), "Home");
+        }
+    }
+
+    [Authorize]
+    [HttpPost]
+    public async Task<IActionResult> ProductDetails(ProductDto product)
+    {
+        var userId = (User.Identity as ClaimsIdentity)?.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+
+        var cart = new CartDto
+        {
+            CartHeader = new CartHeaderDto { UserId = userId },
+            CartDetail = [new CartDetailDto { ProductId = product.ProductId, Count = product.Count }]
+        };
+
+        var response = await _cartService.UpsertItemAsync(cart);
+
+        if (response is not null && response.IsSuccess)
+        {
+            TempData["success"] = "Operation completed successfully";
+            return RedirectToAction(nameof(Index), "Home");
+        }
+        else
+        {
+            TempData["error"] = string.Join(" | ", response?.ErrorMessages ?? ["Oops, Something went wrong"]);
+            return View(product);
         }
     }
 

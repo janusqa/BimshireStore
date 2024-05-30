@@ -1,6 +1,6 @@
 @model ProductDto
 
-<form method="post">
+<form asp-action="ProductDetails">
     <input type="hidden" asp-for="@Model.ProductId" />
     <div class=" pt-4">
         <div class="card container" style="border:1px solid #808080;">
@@ -36,11 +36,11 @@
             </div>
             <div class="card-footer row bg-dark">
                 <div class="col-12 col-md-6 pb-1 ">
-                    <a class="btn btn-success btn-square form-control btn-lg" style="height:50px;" asp-area=""
+                    <a class="btn btn-primary btn-square form-control btn-lg" style="height:50px;" asp-area=""
                         asp-controller="Home" asp-action="Index">Back to List</a>
                 </div>
                 <div class="col-12 col-md-6 ">
-                    <button type="submit" class="btn btn-primary form-control btn-lg" style="height:50px;">Add to
+                    <button type="submit" class="btn btn-success form-control btn-lg" style="height:50px;">Add to
                         Cart</button>
                 </div>
             </div>
