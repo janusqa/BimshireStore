@@ -9,5 +9,7 @@ namespace BimshireStore.Services.IService
         Task<ApiResponse?> UpsertItemAsync(CartDto cart);
         Task<ApiResponse?> RemoveItemAsync(int cartDetailId);
         Task<ApiResponse?> ApplyCouponAsync(CartDto cart);
+        Task<ApiResponse?> EmailCartAsync(CartDto cart);
+
     }
 }

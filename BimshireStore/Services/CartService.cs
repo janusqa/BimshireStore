@@ -24,6 +24,16 @@ namespace BimshireStore.Services
             });
         }
 
+        public async Task<ApiResponse?> EmailCartAsync(CartDto cart)
+        {
+            return await _bs.SendAsync(new ApiRequest
+            {
+                ApiMethod = SD.ApiMethod.POST,
+                Data = cart,
+                Url = $"{SD.ShoppingCartApiBaseAddress}api/carts/email-cart"
+            });
+        }
+
         public async Task<ApiResponse?> GetByUserIdAsync(string userId)
         {
             return await _bs.SendAsync(new ApiRequest
