@@ -2,7 +2,9 @@
 
 <!-- NOTE we have not specified an action. This is because we specify the actions on the buttons or links themselves-->
 <!-- So this form will wupport multiple actions depending on what action is specifited for link or button beding clicked on -->
-<form method="post">
+@if (Model.CartHeader is not null && Model.CartDetail?.Count() > 0)
+{
+    <form method="post">
     <input asp-for="CartHeader.UserId" type="hidden" />
     <input asp-for="CartHeader.CartHeaderId" type="hidden" />
     <br />
@@ -37,66 +39,73 @@
                 </div>
                 <hr />
                 @foreach (var item in Model.CartDetail ?? [])
-                {
-                    <div class="row h-100">
-                        <div class="col-4 col-md-2 text-center py-2">
-                            <img src="@item.Product?.ImageUrl" class="rounded" width="100%" />
+                    {
+                        <div class="row h-100">
+                            <div class="col-4 col-md-2 text-center py-2">
+                                <img src="@item.Product?.ImageUrl" class="rounded" width="100%" />
+                            </div>
+                            <div class="col-8 col-md-5">
+                                <h5>@item.Product?.Name</h5>
+                                <div style="font-size:11px;">@Html.Raw(item.Product?.Description)</div>
+                            </div>
+                            <div class="col-3 col-md-2 pt-md-4" style="font-size:11px;">
+                                <span style="font-size:17px;">@item.Product?.Price.ToString("c")</span>
+                            </div>
+                            <div class="col-3 col-md-2 pt-md-4" style="font-size:11px;">
+                                <span style="font-size:17px;">@item.Count</span>
+                            </div>
+                            <div class="col-2 col-lg-1 p-0 pt-lg-4 text-center">
+                                <a class="btn btn-sm btn-danger" asp-area="" asp-controller="Cart" asp-action="RemoveItem"
+                                    asp-route-cartDetailId="@item.CartDetailId">
+                                    <i class="bi bi-trash-fill"></i>
+                                </a>
+                            </div>
                         </div>
-                        <div class="col-8 col-md-5">
-                            <h5>@item.Product?.Name</h5>
-                            <div style="font-size:11px;">@Html.Raw(item.Product?.Description)</div>
+                    }
+                    <hr />
+                    <div class="row">
+                        <div class="col-6">
+                            @if (string.IsNullOrWhiteSpace(@Model.CartHeader.CouponCode))
+                            {
+                                <span>Coupon:</span>
+                                <input asp-for="CartHeader.CouponCode" />
+                                <button type="submit" class="btn btn-sm btn-success" asp-area="" asp-controller="Cart"
+                                    asp-action="ApplyCoupon"> Apply </button>
+                            }
+                            else
+                            {
+                                <span>Coupon:</span>
+                                <input asp-for="CartHeader.CouponCode" disabled />
+                                <button type="submit" class="btn btn-sm btn-success" asp-area="" asp-controller="Cart"
+                                    asp-action="RemoveCoupon"> Remove </button>
+                            }
                         </div>
-                        <div class="col-3 col-md-2 pt-md-4" style="font-size:11px;">
-                            <span style="font-size:17px;">@item.Product?.Price.ToString("c")</span>
+                        <div class="col-6 text-end">
+                            <span class="text-danger" style="font-size:21px;"> Order Total :
+                                @Model?.CartHeader.CartTotal.ToString("c")
+                                <br /></span>
+                            @if (@Model?.CartHeader.Discount > 0)
+                            {
+                                <span class="text-success"> Order Discount : @Model?.CartHeader.Discount.ToString("c")</span>
+                            }
                         </div>
-                        <div class="col-3 col-md-2 pt-md-4" style="font-size:11px;">
-                            <span style="font-size:17px;">@item.Count</span>
-                        </div>
-                        <div class="col-2 col-lg-1 p-0 pt-lg-4 text-center">
-                            <a class="btn btn-sm btn-danger" asp-area="" asp-controller="Cart" asp-action="RemoveItem"
-                                asp-route-cartDetailId="@item.CartDetailId">
-                                <i class="bi bi-trash-fill"></i>
-                            </a>
-                        </div>
-                    </div>
-                }
-                <hr />
-                <div class="row">
-                    <div class="col-6">
-                        @if (string.IsNullOrWhiteSpace(@Model.CartHeader.CouponCode))
-                        {
-                            <span>Coupon:</span>
-                            <input asp-for="CartHeader.CouponCode" />
-                            <button type="submit" class="btn btn-sm btn-success" asp-area="" asp-controller="Cart"
-                                asp-action="ApplyCoupon"> Apply </button>
-                        }
-                        else
-                        {
-                            <span>Coupon:</span>
-                            <input asp-for="CartHeader.CouponCode" disabled />
-                            <button type="submit" class="btn btn-sm btn-success" asp-area="" asp-controller="Cart"
-                                asp-action="RemoveCoupon"> Remove </button>
-                        }
-                    </div>
-                    <div class="col-6 text-end">
-                        <span class="text-danger" style="font-size:21px;"> Order Total :
-                            @Model?.CartHeader.CartTotal.ToString("c")
-                            <br /></span>
-                        @if (@Model?.CartHeader.Discount > 0)
-                        {
-                            <span class="text-success"> Order Discount : @Model?.CartHeader.Discount.ToString("c")</span>
-                        }
                     </div>
                 </div>
-            </div>
-            <div class="card-footer row">
-                <div class="col-6 col-md-3 ">
-                    <button type="submit" class="btn btn-outline-danger form-control">Email Cart</button>
-                </div>
-                <div class="col-6 col-md-3 offset-md-6">
-                    <button disabled class="btn btn-success form-control">Checkout (Comming Soon!)</button>
+                <div class="card-footer row">
+                    <div class="col-6 col-md-3 ">
+                        <button type="submit" class="btn btn-outline-danger form-control">Email Cart</button>
+                    </div>
+                    <div class="col-6 col-md-3 offset-md-6">
+                        <button disabled class="btn btn-success form-control">Checkout (Comming Soon!)</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</form>
+    </form>
+}
+else
+{
+    <div>
+    <p>Your cart is empty <i class="bi bi-emoji-frown-fill"></i></p>
+</div>
+}
