@@ -78,6 +78,27 @@ public class CartController : Controller
         return RedirectToAction(nameof(CartIndex), "Cart");
     }
 
+    [Authorize]
+    [HttpPost]
+    public async Task<IActionResult> EmailCart(CartDto cart)
+    {
+        var userEmail = (User.Identity as ClaimsIdentity)?.FindFirst(JwtRegisteredClaimNames.Email)?.Value;
+        var cartFromDb = await GetCartByUserIdAsync();
+        cartFromDb.CartHeader.Email = userEmail;
+
+        var response = await _cartService.EmailCartAsync(cartFromDb);
+        if (response is not null && response.IsSuccess)
+        {
+            TempData["success"] = "Operation completed successfully";
+        }
+        else
+        {
+            TempData["error"] = string.Join(" | ", response?.ErrorMessages ?? ["Oops, Something went wrong"]);
+        }
+
+        return RedirectToAction(nameof(CartIndex), "Cart");
+    }
+
     private async Task<CartDto> GetCartByUserIdAsync()
     {
         var userId = (User.Identity as ClaimsIdentity)?.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
