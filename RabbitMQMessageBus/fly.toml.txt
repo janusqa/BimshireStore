@@ -1,0 +1,25 @@
+app = "your-app-name"
+primary_region = "your-3-letter-region-code"
+
+[build]
+[[services]]
+  protocol = "tcp"
+  internal_port = 5672
+
+  [[services.tcp_checks]]
+    interval = "15s"
+    timeout = "1m0s"
+    grace_period = "1s"
+
+[[services]]
+  protocol = "tcp"
+  internal_port = 15672
+
+  [[services.ports]]
+    port = 15672
+    handlers = ["tls", "http"]
+
+  [[services.tcp_checks]]
+    interval = "15s"
+    timeout = "1m0s"
+    grace_period = "1s"
