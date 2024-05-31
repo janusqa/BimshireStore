@@ -722,6 +722,12 @@ RabbitMQ Message Broker
 ===
 1. Set up RabbitMQ in docker
 2. Install Nuget Package in Project "RabbitMQ.Client"
-3. Create MessageBusSender Service (in any project where you want to send messages to queue)
+3. Create MessageBusSender Service (in any project where you want to send messages to queue). Note you can set this up as its own classlib you reference where needed.  This is the best way to go.
 4. Add MessageBusSender Services to services in programs.cs (in any project where you want to send messages to queue)
-5. 
+5. Add to appsettings and secrets the host, username and password for every project that needs it
+6. In a nutshell to use in a project
+   1. Add ServiceBus classlib as a reference to project
+   2. set up appsettions.json with ServiceBus credentials
+   3. Set up dependancy injection in services section of programs.cs for project
+   4. inject ServiceBus where you want to use it, maybe a controller?
+   5. call appropriate methods exposed by ServiceBus service like SendMessage

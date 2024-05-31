@@ -1,4 +1,5 @@
 using System.Globalization;
+using AppLib.ServiceBus.Services.IService;
 using BimshireStore.Services.AuthAPI.Data;
 using BimshireStore.Services.AuthAPI.Models.Dto;
 using BimshireStore.Services.AuthAPI.Services.IService;
@@ -12,14 +13,14 @@ namespace BimshireStore.Services.AuthAPI.Controllers
     {
         private readonly ApplicationDbContext _db;
         private readonly IAuthService _auth;
-        private readonly IMessageBusSender _mbs;
+        private readonly IServiceBusProducer _sbp;
         private readonly IConfiguration _config;
 
-        public AuthController(ApplicationDbContext db, IAuthService auth, IMessageBusSender mbs, IConfiguration config)
+        public AuthController(ApplicationDbContext db, IAuthService auth, IServiceBusProducer sbp, IConfiguration config)
         {
             _db = db;
             _auth = auth;
-            _mbs = mbs;
+            _sbp = sbp;
             _config = config;
         }
 
@@ -47,7 +48,7 @@ namespace BimshireStore.Services.AuthAPI.Controllers
                 { StatusCode = StatusCodes.Status400BadRequest };
             }
 
-            _mbs.SendMessage(
+            _sbp.SendMessage(
                 request.UserName,
                 _config.GetValue<string>("MessageBus:TopicAndQueueNames:RegisterUserQueue")
                     ?? throw new InvalidOperationException("Invalid MessageBus Topic/Queue Name")

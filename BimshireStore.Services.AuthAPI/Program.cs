@@ -1,4 +1,6 @@
 using System.Text;
+using AppLib.ServiceBus.Services;
+using AppLib.ServiceBus.Services.IService;
 using BimshireStore.Services.AuthAPI.Data;
 using BimshireStore.Services.AuthAPI.Models;
 using BimshireStore.Services.AuthAPI.Services;
@@ -86,7 +88,13 @@ builder.Services.AddAuthorizationBuilder();
 builder.Services.AddScoped<IDbInitializer, DbInitializer>();
 builder.Services.AddScoped<IdentityService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IMessageBusSender, MessageBusSender>();
+builder.Services.AddScoped<IServiceBusProducer>(x =>
+    new ServiceBusProducer(
+        builder.Configuration.GetValue<string>("MessageBus:host") ?? throw new InvalidOperationException("Invalid MessageBus Host"),
+        builder.Configuration.GetValue<string>("MessageBus:uid") ?? throw new InvalidOperationException("Invalid MessageBus UID"),
+        builder.Configuration.GetValue<string>("MessageBus:pid") ?? throw new InvalidOperationException("Invalid MessageBus PID")
+    )
+);
 
 // Swagger
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

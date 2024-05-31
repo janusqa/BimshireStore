@@ -1,4 +1,5 @@
 using System.Text.Json;
+using AppLib.ServiceBus.Services.IService;
 using BimshireStore.Services.ShoppingCartAPI.Data;
 using BimshireStore.Services.ShoppingCartAPI.Models;
 using BimshireStore.Services.ShoppingCartAPI.Models.Dto;
@@ -19,13 +20,17 @@ namespace BimshireStore.Services.ShoppingCartAPI.Controllers
         private readonly ApplicationDbContext _db;
         private readonly IProductService _ps;
         private readonly ICouponService _cs;
+        private readonly IServiceBusProducer _sbp;
+        private readonly IConfiguration _config;
 
 
-        public CartController(ApplicationDbContext db, IProductService ps, ICouponService cs)
+        public CartController(ApplicationDbContext db, IProductService ps, ICouponService cs, IServiceBusProducer sbp, IConfiguration config)
         {
             _db = db;
             _ps = ps;
             _cs = cs;
+            _sbp = sbp;
+            _config = config;
         }
 
         [HttpGet("{userId}")]
@@ -299,6 +304,47 @@ namespace BimshireStore.Services.ShoppingCartAPI.Controllers
                           IsSuccess = false,
                           StatusCode = System.Net.HttpStatusCode.NotFound
                       });
+            }
+            catch (Exception ex)
+            {
+                return new ObjectResult(
+                    new ApiResponse
+                    {
+                        IsSuccess = false,
+                        Result = null,
+                        ErrorMessages = [ex.Message],
+                        StatusCode = System.Net.HttpStatusCode.InternalServerError
+                    }
+                )
+                { StatusCode = StatusCodes.Status500InternalServerError };
+            }
+        }
+
+        [HttpPost("email-cart")]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<ApiResponse>> EmailCart([FromBody] CartDto cart)
+        {
+            try
+            {
+                _sbp.SendMessage(
+                    cart,
+                    _config.GetValue<string>("MessageBus:TopicAndQueueNames:EmailCartQueue")
+                        ?? throw new InvalidOperationException("Invalid MessageBus Topic/Queue Name")
+                );
+
+                await Task.CompletedTask;
+
+                return Ok(
+                    new ApiResponse
+                    {
+                        IsSuccess = true,
+                        StatusCode = System.Net.HttpStatusCode.NotFound
+                    });
             }
             catch (Exception ex)
             {
