@@ -69,6 +69,7 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IBaseService, BaseService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICouponService, CouponService>();
+builder.Services.AddTransient<ServiceAccount>(); // NOTE REGISTERED AS TRANSIENT
 
 // API URIs
 SD.CouponApiBaseAddress = builder.Configuration["ServiceUris:CouponApi"]
@@ -84,7 +85,7 @@ builder.Services.AddHttpClient("BimshireStore")
 .ConfigurePrimaryHttpMessageHandler(() =>
     // !!! DISABLE IN PROD. THIS IS TO BYPASS CHECKING SSL CERT AUTH FOR DEV PURPOSES !!!
     new HttpClientHandler { ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator }
-);
+).AddHttpMessageHandler<ServiceAccount>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

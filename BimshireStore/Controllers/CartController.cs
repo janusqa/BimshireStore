@@ -60,6 +60,24 @@ public class CartController : Controller
         return RedirectToAction(nameof(CartIndex), "Cart");
     }
 
+    [Authorize]
+    [HttpPost]
+    public async Task<IActionResult> RemoveCoupon(CartDto cart)
+    {
+        cart.CartHeader.CouponCode = null;
+        var response = await _cartService.ApplyCouponAsync(cart);
+        if (response is not null && response.IsSuccess)
+        {
+            TempData["success"] = "Operation completed successfully";
+        }
+        else
+        {
+            TempData["error"] = string.Join(" | ", response?.ErrorMessages ?? ["Oops, Something went wrong"]);
+        }
+
+        return RedirectToAction(nameof(CartIndex), "Cart");
+    }
+
     private async Task<CartDto> GetCartByUserIdAsync()
     {
         var userId = (User.Identity as ClaimsIdentity)?.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
