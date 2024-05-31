@@ -28,6 +28,38 @@ public class CartController : Controller
         return View(cart);
     }
 
+    [Authorize]
+    [HttpGet]
+    public async Task<IActionResult> RemoveItem(int cartDetailId)
+    {
+        var response = await _cartService.RemoveItemAsync(cartDetailId);
+        if (response is not null && response.IsSuccess)
+        {
+            TempData["success"] = "Operation completed successfully";
+            return RedirectToAction(nameof(CartIndex), "Cart");
+        }
+
+        TempData["error"] = string.Join(" | ", response?.ErrorMessages ?? ["Oops, Something went wrong"]);
+        return RedirectToAction(nameof(CartIndex), "Cart");
+    }
+
+    [Authorize]
+    [HttpPost]
+    public async Task<IActionResult> ApplyCoupon(CartDto cart)
+    {
+        var response = await _cartService.ApplyCouponAsync(cart);
+        if (response is not null && response.IsSuccess)
+        {
+            TempData["success"] = "Operation completed successfully";
+        }
+        else
+        {
+            TempData["error"] = string.Join(" | ", response?.ErrorMessages ?? ["Oops, Something went wrong"]);
+        }
+
+        return RedirectToAction(nameof(CartIndex), "Cart");
+    }
+
     private async Task<CartDto> GetCartByUserIdAsync()
     {
         var userId = (User.Identity as ClaimsIdentity)?.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;

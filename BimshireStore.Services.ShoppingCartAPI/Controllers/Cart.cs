@@ -263,6 +263,21 @@ namespace BimshireStore.Services.ShoppingCartAPI.Controllers
         {
             try
             {
+                if (cart.CartHeader.CouponCode is not null)
+                {
+                    var couponApiresponse = await _cs.GetByCodeAsync(cart.CartHeader.CouponCode);
+                    if (couponApiresponse is null || !couponApiresponse.IsSuccess)
+                    {
+                        return BadRequest(
+                            new ApiResponse
+                            {
+                                IsSuccess = false,
+                                ErrorMessages = ["Invalid Coupon"],
+                                StatusCode = System.Net.HttpStatusCode.BadRequest
+                            });
+                    }
+                }
+
                 var cartHeaderFromDb = await _db.CartHeaders.AsNoTracking().FirstOrDefaultAsync(x => x.UserId == cart.CartHeader.UserId);
 
                 if (cartHeaderFromDb is not null)

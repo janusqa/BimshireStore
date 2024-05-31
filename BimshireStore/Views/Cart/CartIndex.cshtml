@@ -1,6 +1,10 @@
 @model CartDto
 
+<!-- NOTE we have not specified an action. This is because we specify the actions on the buttons or links themselves-->
+<!-- So this form will wupport multiple actions depending on what action is specifited for link or button beding clicked on -->
 <form method="post">
+    <input asp-for="CartHeader.UserId" type="hidden" />
+    <input asp-for="CartHeader.CartHeaderId" type="hidden" />
     <br />
     <div class="">
         <div class="card border mt-4 container">
@@ -49,7 +53,8 @@
                             <span style="font-size:17px;">@item.Count</span>
                         </div>
                         <div class="col-2 col-lg-1 p-0 pt-lg-4 text-center">
-                            <a class="btn btn-sm btn-danger">
+                            <a class="btn btn-sm btn-danger" asp-area="" asp-controller="Cart" asp-action="RemoveItem"
+                                asp-route-cartDetailId="@item.CartDetailId">
                                 <i class="bi bi-trash-fill"></i>
                             </a>
                         </div>
@@ -60,7 +65,8 @@
                     <div class="col-6">
                         <span>Coupon:</span>
                         <input asp-for="CartHeader.CouponCode" />
-                        <button type="submit" class="btn btn-sm btn-success"> Apply </button>
+                        <button type="submit" class="btn btn-sm btn-success" asp-area="" asp-controller="Cart"
+                            asp-action="ApplyCoupon"> Apply </button>
                     </div>
                     <div class="col-6 text-end">
                         <span class="text-danger" style="font-size:21px;"> Order Total : @Model?.CartHeader.CartTotal
