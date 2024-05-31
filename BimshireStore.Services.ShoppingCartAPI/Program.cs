@@ -65,7 +65,6 @@ builder.Services.AddAuthorizationBuilder();
 // Other Services
 builder.Services.AddScoped<IDbInitializer, DbInitializer>();
 builder.Services.AddScoped<IHttpRequestMessageBuilder, HttpRequestMessageBuilder>();
-builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IBaseService, BaseService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICouponService, CouponService>();
@@ -74,8 +73,6 @@ builder.Services.AddTransient<ServiceAccount>(); // NOTE REGISTERED AS TRANSIENT
 // API URIs
 SD.CouponApiBaseAddress = builder.Configuration["ServiceUris:CouponApi"]
     ?? throw new InvalidOperationException("Invalid CouponAPI base Address");
-SD.AuthApiBaseAddress = builder.Configuration["ServiceUris:AuthApi"]
-    ?? throw new InvalidOperationException("Invalid AuthAPI base Address");
 SD.ProductApiBaseAddress = builder.Configuration["ServiceUris:ProductApi"]
     ?? throw new InvalidOperationException("Invalid ProductAPI base Address");
 

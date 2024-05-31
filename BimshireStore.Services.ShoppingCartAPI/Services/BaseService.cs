@@ -11,27 +11,19 @@ namespace BimshireStore.Services.ShoppingCartAPI.Services
     {
         private readonly IHttpClientFactory _hcf;
         private readonly IHttpRequestMessageBuilder _mb;
-        private readonly ITokenService _ts;
 
-        public BaseService(IHttpClientFactory hcf, IHttpRequestMessageBuilder mb, ITokenService ts)
+        public BaseService(IHttpClientFactory hcf, IHttpRequestMessageBuilder mb)
         {
             _hcf = hcf;
             _mb = mb;
-            _ts = ts;
         }
 
         public async Task<ApiResponse?> SendAsync(ApiRequest request, bool withCredentials)
         {
             HttpClient client = _hcf.CreateClient("BimshireStore");
 
-            if (withCredentials)
-            {
-                var token = _ts.GetToken();
-                if (token is not null)
-                {
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-                }
-            }
+            // Note for inter api comunications with token we are using DelegatingHandler
+            // It is why we do not need to add token here manually like in UI.
 
             var messageFactory = () => _mb.Build(request);
 

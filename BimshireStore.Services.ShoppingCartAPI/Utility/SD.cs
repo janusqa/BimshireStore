@@ -11,7 +11,6 @@ namespace BimshireStore.Services.ShoppingCartAPI.Utility
         public const string Role_Employee = "Employee";
 
         public static string? CouponApiBaseAddress { get; set; }
-        public static string? AuthApiBaseAddress { get; set; }
         public static string? ProductApiBaseAddress { get; set; }
 
         public enum ContentType

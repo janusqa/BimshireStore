@@ -674,3 +674,47 @@ https://github.com/dotnet/aspnetcore/issues/48230
 ```
 Thanks for contacting us. Pages and Views aren't supported on Blazor WebAssembly. So you will have to eliminate the reference to Microsoft.AspNetCore.App from that library to be able to reference it from your Blazor WebAssembly project.
 ```
+
+API to API authn/authz
+1. Create a ServiceAccount Class based on DelegatingHandler
+   ```
+   // This class implements api to api authn/authz via the DelegatingHandler
+    // Delegating Handlers are similar to .NET Core Middleware but operated
+    // on the Client Side. So If we are making an http request using 
+    // HTTPClient, we can leverage the DelegatingHandler to pass our Bearer
+    // Token to the other request.
+    public class ServiceAccount : DelegatingHandler
+    {
+        private readonly IHttpContextAccessor _accessor;
+        public ServiceAccount(IHttpContextAccessor accessor)
+        {
+            _accessor = accessor;
+        }
+
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            var context = _accessor.HttpContext;
+
+            if (context is not null)
+            {
+                var token = await context.GetTokenAsync("access_token"); // access_token is a magic string
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            }
+
+            return await base.SendAsync(request, cancellationToken);
+        }
+
+    }
+    ```
+2. Register class in services
+   ```
+   builder.Services.AddTransient<ServiceAccount>(); // NOTE REGISTERED AS TRANSIENT
+   ```
+3. Add this DelegatingHandler to HttpClient in services
+```
+builder.Services.AddHttpClient("MyNamedClient")
+.ConfigurePrimaryHttpMessageHandler(() =>
+    // !!! DISABLE IN PROD. THIS IS TO BYPASS CHECKING SSL CERT AUTH FOR DEV PURPOSES !!!
+    new HttpClientHandler { ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator }
+).AddHttpMessageHandler<ServiceAccount>();
+```
