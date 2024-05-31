@@ -1,4 +1,4 @@
-namespace BimshireStore.Services.AuthAPI.MessageBus
+namespace BimshireStore.Services.AuthAPI.Services.IService
 {
     public interface IMessageBusSender
     {

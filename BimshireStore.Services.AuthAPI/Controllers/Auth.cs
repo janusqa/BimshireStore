@@ -12,11 +12,15 @@ namespace BimshireStore.Services.AuthAPI.Controllers
     {
         private readonly ApplicationDbContext _db;
         private readonly IAuthService _auth;
+        private readonly IMessageBusSender _mbs;
+        private readonly IConfiguration _config;
 
-        public AuthController(ApplicationDbContext db, IAuthService auth)
+        public AuthController(ApplicationDbContext db, IAuthService auth, IMessageBusSender mbs, IConfiguration config)
         {
             _db = db;
             _auth = auth;
+            _mbs = mbs;
+            _config = config;
         }
 
         [HttpPost("register")]
@@ -42,6 +46,12 @@ namespace BimshireStore.Services.AuthAPI.Controllers
                 )
                 { StatusCode = StatusCodes.Status400BadRequest };
             }
+
+            _mbs.SendMessage(
+                request.UserName,
+                _config.GetValue<string>("MessageBus:TopicAndQueueNames:RegisterUserQueue")
+                    ?? throw new InvalidOperationException("Invalid MessageBus Topic/Queue Name")
+            );
 
             return Ok(
                 new ApiResponse

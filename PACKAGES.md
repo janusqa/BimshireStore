@@ -11,6 +11,7 @@ API
 Auth API (additional packages)
 ===
 - dotnet add BimshireStore.Services.AuthAPI package Microsoft.AspNetCore.Identity.EntityFrameworkCore
+- dotnet add BimshireStore.Services.AuthAPI package RabbitMQ.Client
 
 UI (additional packages)
 ===

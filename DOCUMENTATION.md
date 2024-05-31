@@ -718,3 +718,10 @@ builder.Services.AddHttpClient("MyNamedClient")
     new HttpClientHandler { ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator }
 ).AddHttpMessageHandler<ServiceAccount>();
 ```
+RabbitMQ Message Broker
+===
+1. Set up RabbitMQ in docker
+2. Install Nuget Package in Project "RabbitMQ.Client"
+3. Create MessageBusSender Service (in any project where you want to send messages to queue)
+4. Add MessageBusSender Services to services in programs.cs (in any project where you want to send messages to queue)
+5. 
