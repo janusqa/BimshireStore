@@ -727,7 +727,9 @@ RabbitMQ Message Broker
 5. Add to appsettings and secrets the host, username and password for every project that needs it
 6. In a nutshell to use in a project
    1. Add ServiceBus classlib as a reference to project
-   2. set up appsettions.json with ServiceBus credentials
+   2. set up appsettions.json with ServiceBus credentials and queues project will need
    3. Set up dependancy injection in services section of programs.cs for project
-   4. inject ServiceBus where you want to use it, maybe a controller?
-   5. call appropriate methods exposed by ServiceBus service like SendMessage
+   4. inject ServiceBusProducer as scopped where you want to use it, maybe a controller?
+   5. inject ServiceBusConsumer as Singleton were you want to use it. mabe a hostedservice
+      1. Derive your specific consuemers from ServiceBusConsumer and register them as HostedService in programs.cs. These must consumers must implement IHostedLiftemService in order to be able to run in the background and process the messages when able.
+   6. call appropriate methods exposed by ServiceBus service like SendMessage
