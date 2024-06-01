@@ -26,10 +26,17 @@ namespace AppLib.ServiceBus.Services
 
         public void SendMessage(object message, string queueName)
         {
-            _channel.QueueDeclare(queueName, false, false, false, null);
-            var jsonMessage = JsonSerializer.Serialize(message);
-            var body = Encoding.UTF8.GetBytes(jsonMessage);
-            _channel.BasicPublish(exchange: "", routingKey: queueName, null, body: body);
+            try
+            {
+                _channel.QueueDeclare(queueName, false, false, false, null);
+                var jsonMessage = JsonSerializer.Serialize(message);
+                var body = Encoding.UTF8.GetBytes(jsonMessage);
+                _channel.BasicPublish(exchange: "", routingKey: queueName, null, body: body);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error sending message to ServiceBus: {ex.Message}");
+            }
         }
 
         public void Dispose()

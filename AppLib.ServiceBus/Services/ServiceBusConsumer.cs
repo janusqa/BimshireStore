@@ -53,11 +53,18 @@ namespace AppLib.ServiceBus.Services
         {
             return async (ch, ea) =>
             {
-                var content = Encoding.UTF8.GetString(ea.Body.ToArray());
+                try
+                {
+                    var content = Encoding.UTF8.GetString(ea.Body.ToArray());
 
-                await ProcessMessage(content);
+                    await ProcessMessage(content);
 
-                _channel.BasicAck(ea.DeliveryTag, false);
+                    _channel.BasicAck(ea.DeliveryTag, false);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error processing ServiceBus message: {ex.Message}");
+                }
             };
         }
 
