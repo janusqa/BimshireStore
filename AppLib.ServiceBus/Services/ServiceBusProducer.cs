@@ -5,21 +5,14 @@ using RabbitMQ.Client;
 
 namespace AppLib.ServiceBus.Services
 {
-    public class ServiceBusProducer : IServiceBusProducer
+    public class ServiceBusProducer : IServiceBusProducer, IDisposable
     {
-        // private readonly IConfiguration _config;
-        // private readonly string _hostName;
-        // private readonly string _username;
-        // private readonly string _password; 
-        private IConnection _connection { get; }
+        private readonly IConnection _connection;
+        private readonly IModel _channel;
+        private bool _disposed;
 
         public ServiceBusProducer(string hostname, string username, string password)
         {
-            // _config = config;
-            // _hostName = _config.GetValue<string>("MessageBus:host") ?? throw new InvalidOperationException("Invalid MessageBus Host");
-            // _username = _config.GetValue<string>("MessageBus:uid") ?? throw new InvalidOperationException("Invalid MessageBus UID");
-            // _password = _config.GetValue<string>("MessageBus:pid") ?? throw new InvalidOperationException("Invalid MessageBus PID");
-
             var factory = new ConnectionFactory
             {
                 HostName = hostname,
@@ -28,15 +21,40 @@ namespace AppLib.ServiceBus.Services
             };
 
             _connection = factory.CreateConnection();
+            _channel = _connection.CreateModel();
         }
 
         public void SendMessage(object message, string queueName)
         {
-            using var channel = _connection.CreateModel();
-            channel.QueueDeclare(queueName, false, false, false, null);
+            _channel.QueueDeclare(queueName, false, false, false, null);
             var jsonMessage = JsonSerializer.Serialize(message);
             var body = Encoding.UTF8.GetBytes(jsonMessage);
-            channel.BasicPublish(exchange: "", routingKey: queueName, null, body: body);
+            _channel.BasicPublish(exchange: "", routingKey: queueName, null, body: body);
+        }
+
+        public void Dispose()
+        {
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    _channel?.Dispose();
+                    _connection?.Dispose();
+                }
+
+                _disposed = true;
+            }
+        }
+
+        ~ServiceBusProducer()
+        {
+            Dispose(disposing: false);
         }
     }
 }
