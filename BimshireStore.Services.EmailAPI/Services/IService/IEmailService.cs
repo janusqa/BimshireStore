@@ -6,6 +6,6 @@ namespace BimshireStore.Services.EmailAPI.Services.IService
     {
         Task CartEmailAndLog(CartDto cart);
         Task RegisteredUserEmailAndLog(string email);
-        Task OrderPlacedEmailAndLog(RewardDto reward, string email);
+        Task OrderPlacedEmailAndLog(RewardDto reward);
     }
 }

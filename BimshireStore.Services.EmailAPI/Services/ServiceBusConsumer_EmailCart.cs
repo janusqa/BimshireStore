@@ -1,19 +1,20 @@
 
 using System.Text.Json;
 using AppLib.ServiceBus.Services.IService;
+using BimshireStore.Services.EmailAPI.Models.Dto;
 using BimshireStore.Services.EmailAPI.Services.IService;
 using static BimshireStore.Services.ShoppingCartAPI.Utility.SD;
 
 namespace BimshireStore.Services.EmailAPI.Services
 {
-    public class ServiceBusConsumerEmail : IHostedLifecycleService
+    public class ServiceBusConsumer_EmailCart : IHostedLifecycleService
     {
         private readonly IServiceBusConsumer _sbc;
         private readonly IConfiguration _config;
         private readonly IServiceProvider _serviceProvider;
         private readonly string _queueName;
 
-        public ServiceBusConsumerEmail(IConfiguration config, IServiceProvider serviceProvider, IServiceBusConsumer sbc)
+        public ServiceBusConsumer_EmailCart(IConfiguration config, IServiceProvider serviceProvider, IServiceBusConsumer sbc)
         {
             _sbc = sbc;
             _config = config;
@@ -56,16 +57,15 @@ namespace BimshireStore.Services.EmailAPI.Services
 
         private async Task ProcessMessage(string content)
         {
-            Console.WriteLine($"Processing Message: {content}");
             if (content is not null)
             {
                 using (var scope = _serviceProvider.CreateScope())
                 {
                     var emailService = scope.ServiceProvider.GetRequiredService<IEmailService>();
-                    if (emailService != null)
+                    if (emailService is not null)
                     {
-                        var email = JsonSerializer.Deserialize<string>(content, JsonSerializerConfig.DefaultOptions);
-                        if (email is not null) await emailService.RegisteredUserEmailAndLog(email);
+                        var cart = JsonSerializer.Deserialize<CartDto>(content, JsonSerializerConfig.DefaultOptions);
+                        if (cart is not null) await emailService.CartEmailAndLog(cart);
                     }
                 }
             }

@@ -9,9 +9,10 @@ namespace AppLib.ServiceBus.Services
     {
         private readonly IConnection _connection;
         private readonly IModel _channel;
-        private EventingBasicConsumer? _consumer;
-        private EventHandler<BasicDeliverEventArgs>? ConsumerReceivedHandler { get; set; }
+        private readonly Dictionary<string, EventingBasicConsumer> _consumers;
+        private readonly Dictionary<string, EventHandler<BasicDeliverEventArgs>> _handlers;
         private bool _disposed = false;
+        private readonly object _lock;
 
         public ServiceBusConsumer(string hostname, string username, string password)
         {
@@ -24,18 +25,31 @@ namespace AppLib.ServiceBus.Services
 
             _connection = factory.CreateConnection();
             _channel = _connection.CreateModel();
+            _consumers = [];
+            _handlers = [];
+            _lock = new();
         }
 
         public void Init(Func<string, Task> ProcessMessage, string queueName)
         {
-            _channel.QueueDeclare(queueName, false, false, false, null);
-            _consumer = new EventingBasicConsumer(_channel);
-            ConsumerReceivedHandler = ConsumerReceivedEvent(ProcessMessage);
-            _consumer.Received += ConsumerReceivedHandler;
-            _channel.BasicConsume(queueName, false, _consumer);
+            lock (_lock)
+            {
+                if (_consumers.ContainsKey(queueName)) throw new InvalidOperationException($"Queue '{queueName}' is already exist.");
+
+                _channel.QueueDeclare(queueName, false, false, false, null);
+
+                var consumer = new EventingBasicConsumer(_channel);
+                var handler = CreateEventHandler(ProcessMessage);
+                consumer.Received += handler;
+
+                _consumers[queueName] = consumer;
+                _handlers[queueName] = handler;
+
+                _channel.BasicConsume(queueName, false, _consumers[queueName]);
+            }
         }
 
-        private EventHandler<BasicDeliverEventArgs> ConsumerReceivedEvent(Func<string, Task> ProcessMessage)
+        private EventHandler<BasicDeliverEventArgs> CreateEventHandler(Func<string, Task> ProcessMessage)
         {
             return async (ch, ea) =>
             {
@@ -59,16 +73,20 @@ namespace AppLib.ServiceBus.Services
             {
                 if (disposing)
                 {
-                    if (ConsumerReceivedHandler is not null && _consumer is not null)
+                    lock (_lock)
                     {
-                        if (_consumer is not null) _consumer.Received -= ConsumerReceivedHandler;
-                        ConsumerReceivedHandler = null;
+                        foreach (var (queueName, consumer) in _consumers)
+                        {
+                            if (_handlers.TryGetValue(queueName, out var handler) && consumer is not null)
+                            {
+                                consumer.Received -= handler;
+                            }
+                        }
+
+                        _channel?.Dispose();
+                        _connection?.Dispose();
                     }
-
-                    _channel?.Dispose();
-                    _connection?.Dispose();
                 }
-
                 _disposed = true;
             }
         }

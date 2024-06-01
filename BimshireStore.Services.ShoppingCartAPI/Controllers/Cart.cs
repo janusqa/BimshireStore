@@ -44,7 +44,6 @@ namespace BimshireStore.Services.ShoppingCartAPI.Controllers
         {
             try
             {
-                Console.WriteLine(userId);
                 var cartHeaderFromDb = await _db.CartHeaders.Where(x => x.UserId == userId).FirstOrDefaultAsync();
                 if (cartHeaderFromDb is not null)
                 {

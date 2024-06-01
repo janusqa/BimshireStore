@@ -38,19 +38,19 @@ namespace Mango.Services.EmailAPI.Services
                 message.Append("<p>No items in cart.</p>");
             }
 
-            if (cart.CartHeader.Email is not null) await LogAndEmail(message.ToString(), cart.CartHeader.Email);
+            if (cart.CartHeader.Email is not null) await LogAndEmail(cart.CartHeader.Email, message.ToString());
         }
 
-        public async Task OrderPlacedEmailAndLog(RewardDto reward, string email)
+        public async Task OrderPlacedEmailAndLog(RewardDto reward)
         {
             string message = "New Order Placed. <br/> Order ID : " + reward.OrderId;
-            await LogAndEmail(message, email);
+            await LogAndEmail("admin1@string.com", message);
         }
 
         public async Task RegisteredUserEmailAndLog(string email)
         {
             string message = $"User Registeration Successful. <br/> Email : {email}";
-            await LogAndEmail(message, email);
+            await LogAndEmail("admin1@string.com", message);
         }
 
         private async Task<string> LogAndEmail(string email, string message)
