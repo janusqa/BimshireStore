@@ -83,6 +83,7 @@ builder.Services.AddSingleton<IServiceBusConsumer>(x =>
 //     x.StartupTimeout = TimeSpan.FromSeconds(10);
 // });
 builder.Services.AddHostedService<ServiceBusConsumer_EmailCart>();
+builder.Services.AddHostedService<ServiceBusConsumer_RegisterUser>();
 
 builder.Services.AddControllers();
 
