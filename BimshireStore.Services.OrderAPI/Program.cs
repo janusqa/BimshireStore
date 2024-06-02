@@ -1,6 +1,9 @@
 using System.Text;
 using BimshireStore.Services.OrderAPI.Data;
 using BimshireStore.Services.OrderAPI.Models;
+using BimshireStore.Services.OrderAPI.Services;
+using BimshireStore.Services.OrderCartAPI.Services.IService;
+using BimshireStore.Services.ShoppingCartAPI.Utility;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
@@ -61,7 +64,19 @@ builder.Services.AddAuthorizationBuilder();
 
 // Other Services
 builder.Services.AddScoped<IDbInitializer, DbInitializer>();
+builder.Services.AddTransient<IServiceAccount, ServiceAccount>(); // NOTE REGISTERED AS TRANSIENT
 
+// API URIs
+SD.ProductApiBaseAddress = builder.Configuration["ServiceUris:ProductApi"]
+    ?? throw new InvalidOperationException("Invalid ProductAPI base Address");
+
+// HTTPClient
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddHttpClient("BimshireStore")
+.ConfigurePrimaryHttpMessageHandler(() =>
+    // !!! DISABLE IN PROD. THIS IS TO BYPASS CHECKING SSL CERT AUTH FOR DEV PURPOSES !!!
+    new HttpClientHandler { ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator }
+).AddHttpMessageHandler<ServiceAccount>();
 
 builder.Services.AddControllers();
 

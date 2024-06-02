@@ -1,8 +1,8 @@
 using System.Net.Http.Headers;
-using BimshireStore.Services.ShoppingCartAPI.Services.IService;
+using BimshireStore.Services.OrderCartAPI.Services.IService;
 using Microsoft.AspNetCore.Authentication;
 
-namespace BimshireStore.Services.ShoppingCartAPI.Services
+namespace BimshireStore.Services.OrderAPI.Services
 {
 
     // This class implements api to api authn/authz via the DelegatingHandler

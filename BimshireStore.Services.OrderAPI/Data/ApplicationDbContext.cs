@@ -13,7 +13,8 @@ namespace BimshireStore.Services.OrderAPI.Data
         }
 
         public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
-        // public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderHeader> OrderHeaders { get; set; }
+        public DbSet<OrderDetail> OrderDetailss { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

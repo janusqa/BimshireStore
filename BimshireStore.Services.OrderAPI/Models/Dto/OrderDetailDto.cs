@@ -4,7 +4,6 @@ namespace BimshireStore.Services.OrderAPI.Models.Dto
     {
         public int OrderDetailId { get; set; }
         public int OrderHeaderId { get; set; }
-        public OrderDetail? OrderHeader { get; set; }
         public int ProductId { get; set; }
         public ProductDto? Product { get; set; }
         public string ProductName { get; set; } = string.Empty;

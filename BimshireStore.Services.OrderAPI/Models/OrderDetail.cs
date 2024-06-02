@@ -11,7 +11,7 @@ namespace BimshireStore.Services.OrderAPI.Models
         public int OrderHeaderId { get; set; }
         [ForeignKey("OrderHeaderId")]
         [NotMapped]
-        public OrderDetail? OrderHeader { get; set; }
+        public OrderHeader? OrderHeader { get; set; }
         public int ProductId { get; set; }
         [ForeignKey("ProductId")]
         [NotMapped]

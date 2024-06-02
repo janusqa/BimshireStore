@@ -37,7 +37,6 @@ namespace BimshireStore.Services.OrderAPI.Models.Extensions
             {
                 OrderDetailId = orderDetail.OrderDetailId,
                 OrderHeaderId = orderDetail.OrderHeaderId,
-                OrderHeader = orderDetail.OrderHeader,
                 ProductId = orderDetail.ProductId,
                 Product = orderDetail.Product,
                 ProductName = orderDetail.ProductName,

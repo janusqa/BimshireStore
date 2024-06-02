@@ -712,6 +712,7 @@ API to API authn/authz
    ```
 3. Add this DelegatingHandler to HttpClient in services
 ```
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient("MyNamedClient")
 .ConfigurePrimaryHttpMessageHandler(() =>
     // !!! DISABLE IN PROD. THIS IS TO BYPASS CHECKING SSL CERT AUTH FOR DEV PURPOSES !!!
