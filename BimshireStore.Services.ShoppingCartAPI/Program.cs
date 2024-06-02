@@ -70,7 +70,7 @@ builder.Services.AddScoped<IHttpRequestMessageBuilder, HttpRequestMessageBuilder
 builder.Services.AddScoped<IBaseService, BaseService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICouponService, CouponService>();
-builder.Services.AddTransient<IServiceAccount, ServiceAccount>(); // NOTE REGISTERED AS TRANSIENT
+builder.Services.AddTransient<ServiceAccount>(); // NOTE REGISTERED AS TRANSIENT
 builder.Services.AddScoped<IServiceBusProducer>(x =>
     new ServiceBusProducer(
         builder.Configuration.GetValue<string>("MessageBus:host") ?? throw new InvalidOperationException("Invalid MessageBus Host"),

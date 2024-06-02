@@ -1,10 +1,10 @@
 @model CartDto
 
-<!-- NOTE we have not specified an action. This is because we specify the actions on the buttons or links themselves-->
-<!-- So this form will wupport multiple actions depending on what action is specifited for link or button beding clicked on -->
 @if (Model.CartHeader is not null && Model.CartDetail?.Count() > 0)
 {
-    <form method="post">
+    <!-- NOTE we have not specified an action. This is because we specify the actions on the buttons or links themselves-->
+    <!-- So this form will wupport multiple actions depending on what action is specifited for link or button beding clicked on -->
+    <form method="POST">
     <input asp-for="CartHeader.UserId" type="hidden" />
     <input asp-for="CartHeader.CartHeaderId" type="hidden" />
     <br />

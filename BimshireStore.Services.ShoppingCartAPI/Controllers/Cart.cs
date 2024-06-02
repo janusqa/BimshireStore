@@ -45,6 +45,7 @@ namespace BimshireStore.Services.ShoppingCartAPI.Controllers
             try
             {
                 var cartHeaderFromDb = await _db.CartHeaders.Where(x => x.UserId == userId).FirstOrDefaultAsync();
+
                 if (cartHeaderFromDb is not null)
                 {
                     var cartDetailsFromDb = _db.CartDetails.Where(x => x.CartHeaderId == cartHeaderFromDb.CartHeaderId);
@@ -78,8 +79,6 @@ namespace BimshireStore.Services.ShoppingCartAPI.Controllers
                         }
                     }
 
-                    Console.WriteLine(new CartDto { CartHeader = cartHeaderFromDb.ToDto(), CartDetail = cartDetailsFromDb.Select(x => x.ToDto()) });
-
                     return Ok(
                         new ApiResponse
                         {
@@ -97,7 +96,6 @@ namespace BimshireStore.Services.ShoppingCartAPI.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
                 return new ObjectResult(
                     new ApiResponse
                     {

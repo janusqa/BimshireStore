@@ -2,7 +2,7 @@
 
 @if (Model.CartHeader is not null && Model.CartDetail?.Count() > 0)
 {
-    <form method="post">
+    <form method="POST">
     <input type="hidden" asp-for="CartHeader.UserId" />
     <input type="hidden" asp-for="CartHeader.CartHeaderId" />
     <input type="hidden" asp-for="CartHeader.CouponCode" />

@@ -2,8 +2,8 @@ using System.Text;
 using BimshireStore.Services.OrderAPI.Data;
 using BimshireStore.Services.OrderAPI.Models;
 using BimshireStore.Services.OrderAPI.Services;
+using BimshireStore.Services.OrderAPI.Services.IService;
 using BimshireStore.Services.OrderAPI.Utility;
-using BimshireStore.Services.OrderCartAPI.Services.IService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
@@ -64,7 +64,11 @@ builder.Services.AddAuthorizationBuilder();
 
 // Other Services
 builder.Services.AddScoped<IDbInitializer, DbInitializer>();
-builder.Services.AddTransient<IServiceAccount, ServiceAccount>(); // NOTE REGISTERED AS TRANSIENT
+builder.Services.AddScoped<IHttpRequestMessageBuilder, HttpRequestMessageBuilder>();
+builder.Services.AddScoped<IBaseService, BaseService>();
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddTransient<ServiceAccount>(); // NOTE REGISTERED AS TRANSIENT
+
 
 // API URIs
 SD.ProductApiBaseAddress = builder.Configuration["ServiceUris:ProductApi"]

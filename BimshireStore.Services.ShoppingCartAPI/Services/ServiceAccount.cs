@@ -1,5 +1,4 @@
 using System.Net.Http.Headers;
-using BimshireStore.Services.ShoppingCartAPI.Services.IService;
 using Microsoft.AspNetCore.Authentication;
 
 namespace BimshireStore.Services.ShoppingCartAPI.Services
@@ -10,7 +9,7 @@ namespace BimshireStore.Services.ShoppingCartAPI.Services
     // on the Client Side. So If we are making an http request using 
     // HTTPClient, we can leverage the DelegatingHandler to pass our Bearer
     // Token to the other request.
-    public class ServiceAccount : DelegatingHandler, IServiceAccount
+    public class ServiceAccount : DelegatingHandler
     {
         private readonly IHttpContextAccessor _accessor;
         public ServiceAccount(IHttpContextAccessor accessor)

@@ -28,6 +28,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<ICartService, CartService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddSingleton<IHttpRequestMessageBuilder, HttpRequestMessageBuilder>();
 
 // API URIs
@@ -39,6 +40,8 @@ SD.ProductApiBaseAddress = builder.Configuration["ServiceUris:ProductApi"]
     ?? throw new InvalidOperationException("Invalid ProductAPI base Address");
 SD.ShoppingCartApiBaseAddress = builder.Configuration["ServiceUris:ShoppingCartApi"]
     ?? throw new InvalidOperationException("Invalid ShoppingCartAPI base Address");
+SD.OrderApiBaseAddress = builder.Configuration["ServiceUris:OrderApi"]
+    ?? throw new InvalidOperationException("Invalid OrderAPI base Address");
 
 // HTTPClient
 builder.Services.AddHttpContextAccessor();
