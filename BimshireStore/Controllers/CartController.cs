@@ -131,6 +131,14 @@ namespace BimshireStore.Controllers
             return View(cart);
         }
 
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> Confirmation(int orderId)
+        {
+            await Task.CompletedTask;
+            return View(orderId);
+        }
+
         private async Task<CartDto> GetCartByUserIdAsync()
         {
             var userId = (User.Identity as ClaimsIdentity)?.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
