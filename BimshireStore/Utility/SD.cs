@@ -21,6 +21,7 @@ namespace BimshireStore.Utility
 
         public const string TokenCookie = "BimshireStoreJwtToken";
 
+        public static string? AppBaseAddress { get; set; }
         public static string? CouponApiBaseAddress { get; set; }
         public static string? AuthApiBaseAddress { get; set; }
         public static string? ProductApiBaseAddress { get; set; }

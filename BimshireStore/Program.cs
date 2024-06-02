@@ -31,7 +31,9 @@ builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddSingleton<IHttpRequestMessageBuilder, HttpRequestMessageBuilder>();
 
-// API URIs
+// App & API URIs
+SD.AppBaseAddress = builder.Configuration["AppUris:BaseUrl"]
+    ?? throw new InvalidOperationException("Invalid App base Address");
 SD.CouponApiBaseAddress = builder.Configuration["ServiceUris:CouponApi"]
     ?? throw new InvalidOperationException("Invalid CouponAPI base Address");
 SD.AuthApiBaseAddress = builder.Configuration["ServiceUris:AuthApi"]

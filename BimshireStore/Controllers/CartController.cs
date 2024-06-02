@@ -2,10 +2,10 @@ using System.Security.Claims;
 using System.Text.Json;
 using BimshireStore.Models.Dto;
 using BimshireStore.Services.IService;
+using BimshireStore.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.JsonWebTokens;
-using static BimshireStore.Utility.SD;
 
 namespace BimshireStore.Controllers
 {
@@ -124,10 +124,29 @@ namespace BimshireStore.Controllers
 
             if (orderCreated is not null && orderCreated.IsSuccess)
             {
-                var orderHeader = JsonSerializer.Deserialize<OrderHeaderDto>(JsonSerializer.Serialize(orderCreated.Result), JsonSerializerConfig.DefaultOptions);
-                Console.WriteLine(orderHeader);
+                var orderHeader = JsonSerializer.Deserialize<OrderHeaderDto>(JsonSerializer.Serialize(orderCreated.Result), SD.JsonSerializerConfig.DefaultOptions);
+                if (orderHeader is not null)
+                {
+                    var stripeRequest = new StripeRequest
+                    {
+                        ApprovedUrl = $"{SD.AppBaseAddress}/Cart/Confirmation?orderId={orderHeader.OrderHeaderId}",
+                        CancelledUrl = $"{SD.AppBaseAddress}/Cart/Checkout",
+                        OrderHeaderDto = orderHeader,
+                        StripeSessionId = string.Empty,
+                        StripeSessionUrl = string.Empty
+                    };
+
+                    var response = await _orderService.CreateStripeSession(stripeRequest);
+                    if (response is not null && response.IsSuccess)
+                    {
+                        stripeRequest = JsonSerializer.Deserialize<StripeRequest>(JsonSerializer.Serialize(response.Result), SD.JsonSerializerConfig.DefaultOptions);
+                        if (stripeRequest is not null) Response.Headers.Append("Location", stripeRequest.StripeSessionUrl);
+                        return new StatusCodeResult(303);
+                    }
+                }
             }
 
+            TempData["error"] = "There was an error processing your order. Please try again later";
             return View(cart);
         }
 
@@ -148,7 +167,7 @@ namespace BimshireStore.Controllers
 
                 if (response is not null && response.IsSuccess)
                 {
-                    var cart = JsonSerializer.Deserialize<CartDto>(JsonSerializer.Serialize(response.Result), JsonSerializerConfig.DefaultOptions);
+                    var cart = JsonSerializer.Deserialize<CartDto>(JsonSerializer.Serialize(response.Result), SD.JsonSerializerConfig.DefaultOptions);
                     if (cart is not null) return cart;
                 }
             }
