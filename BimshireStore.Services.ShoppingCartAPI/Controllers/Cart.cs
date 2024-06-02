@@ -78,6 +78,8 @@ namespace BimshireStore.Services.ShoppingCartAPI.Controllers
                         }
                     }
 
+                    Console.WriteLine(new CartDto { CartHeader = cartHeaderFromDb.ToDto(), CartDetail = cartDetailsFromDb.Select(x => x.ToDto()) });
+
                     return Ok(
                         new ApiResponse
                         {
@@ -95,6 +97,7 @@ namespace BimshireStore.Services.ShoppingCartAPI.Controllers
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex.Message);
                 return new ObjectResult(
                     new ApiResponse
                     {

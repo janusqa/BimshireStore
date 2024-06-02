@@ -1,12 +1,16 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace BimshireStore.Services.ShoppingCartAPI.Models.Dto
 {
     public record CartHeaderDto
     {
         public int CartHeaderId { get; set; }
         public string? UserId { get; set; }
-        public string? Firstname { get; set; }
-        public string? Lastname { get; set; }
+        [Required]
+        public string? Name { get; set; }
+        [Required]
         public string? Phone { get; set; }
+        [Required]
         public string? Email { get; set; }
         public string? CouponCode { get; set; }
         public double Discount { get; set; }

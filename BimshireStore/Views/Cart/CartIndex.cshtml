@@ -38,7 +38,7 @@
                     </div>
                 </div>
                 <hr />
-                @foreach (var item in Model.CartDetail ?? [])
+                @foreach (var item in Model.CartDetail)
                     {
                         <div class="row h-100">
                             <div class="col-4 col-md-2 text-center py-2">
@@ -61,8 +61,8 @@
                                 </a>
                             </div>
                         </div>
+                        <hr />
                     }
-                    <hr />
                     <div class="row">
                         <div class="col-6">
                             @if (string.IsNullOrWhiteSpace(@Model.CartHeader.CouponCode))
@@ -83,9 +83,10 @@
                         <div class="col-6 text-end">
                             <span class="text-danger" style="font-size:21px;"> Order Total :
                                 @Model?.CartHeader.CartTotal.ToString("c")
-                                <br /></span>
+                            </span>
                             @if (@Model?.CartHeader.Discount > 0)
                             {
+                                <br />
                                 <span class="text-success"> Order Discount : @Model?.CartHeader.Discount.ToString("c")</span>
                             }
                         </div>
@@ -97,7 +98,8 @@
                             asp-action="EmailCart">Email Cart</button>
                     </div>
                     <div class="col-6 col-md-3 offset-md-6">
-                        <button disabled class="btn btn-success form-control">Checkout (Comming Soon!)</button>
+                        <a class="btn btn-success form-control" asp-area="" asp-controller="Cart"
+                            asp-action="Checkout">Checkout</a>
                     </div>
                 </div>
             </div>

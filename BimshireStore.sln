@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppLib.ServiceBus", "AppLib
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BimshireStore.Services.EmailAPI", "BimshireStore.Services.EmailAPI\BimshireStore.Services.EmailAPI.csproj", "{7A7ACE93-4614-4058-AB14-8A15B02C41ED}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BimshireStore.Services.OrderAPI", "BimshireStore.Services.OrderAPI\BimshireStore.Services.OrderAPI.csproj", "{A1C871C5-03D2-4BEA-AF0A-2D1EC5E1E261}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{7A7ACE93-4614-4058-AB14-8A15B02C41ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7A7ACE93-4614-4058-AB14-8A15B02C41ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7A7ACE93-4614-4058-AB14-8A15B02C41ED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1C871C5-03D2-4BEA-AF0A-2D1EC5E1E261}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1C871C5-03D2-4BEA-AF0A-2D1EC5E1E261}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1C871C5-03D2-4BEA-AF0A-2D1EC5E1E261}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1C871C5-03D2-4BEA-AF0A-2D1EC5E1E261}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

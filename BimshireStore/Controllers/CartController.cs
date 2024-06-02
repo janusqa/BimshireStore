@@ -99,6 +99,14 @@ public class CartController : Controller
         return RedirectToAction(nameof(CartIndex), "Cart");
     }
 
+    [Authorize]
+    [HttpGet]
+    public async Task<IActionResult> Checkout()
+    {
+        var cart = await GetCartByUserIdAsync();
+        return View(cart);
+    }
+
     private async Task<CartDto> GetCartByUserIdAsync()
     {
         var userId = (User.Identity as ClaimsIdentity)?.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
