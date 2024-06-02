@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace BimshireStore.Services.ShoppingCartAPI.Utility
+namespace BimshireStore.Services.OrderAPI.Utility
 {
 
     public static class SD

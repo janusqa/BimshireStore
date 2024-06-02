@@ -719,6 +719,7 @@ builder.Services.AddHttpClient("MyNamedClient")
     new HttpClientHandler { ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator }
 ).AddHttpMessageHandler<ServiceAccount>();
 ```
+4. Add Services for contacting APIs you are interested in along with the IBaseService and it's HTTPMessageBuilderService
 RabbitMQ Message Broker
 ===
 1. Set up RabbitMQ in docker
