@@ -30,6 +30,6 @@ namespace BimshireStore.Services.ShoppingCartAPI.Models.Dto
     public record CartDto
     {
         public required CartHeaderDto CartHeader { get; set; }
-        public IEnumerable<CartDetailDto>? CartDetail { get; set; }
+        public IEnumerable<CartDetailDto> CartDetail { get; set; } = [];
     }
 }
