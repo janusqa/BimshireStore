@@ -82,6 +82,9 @@ builder.Services.AddHttpClient("BimshireStore")
     new HttpClientHandler { ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator }
 ).AddHttpMessageHandler<ServiceAccount>();
 
+// Stripe.net
+Stripe.StripeConfiguration.ApiKey = builder.Configuration.GetSection("Stripe:SecretKey").Get<string>() ?? throw new InvalidOperationException("Stripe SecretKey not found");
+
 builder.Services.AddControllers();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

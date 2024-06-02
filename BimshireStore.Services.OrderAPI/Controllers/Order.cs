@@ -7,7 +7,7 @@ using BimshireStore.Services.OrderAPI.Services.IService;
 using BimshireStore.Services.OrderAPI.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using Stripe.Checkout;
 using static BimshireStore.Services.OrderAPI.Utility.SD;
 
 namespace BimshireStore.Services.OrderAPI.Controllers
@@ -67,6 +67,74 @@ namespace BimshireStore.Services.OrderAPI.Controllers
                         IsSuccess = false,
                         ErrorMessages = ["Failed to create order"],
                         StatusCode = System.Net.HttpStatusCode.BadRequest
+                    });
+            }
+            catch (Exception ex)
+            {
+                return new ObjectResult(
+                    new ApiResponse
+                    {
+                        IsSuccess = false,
+                        Result = null,
+                        ErrorMessages = [ex.Message],
+                        StatusCode = System.Net.HttpStatusCode.InternalServerError
+                    }
+                )
+                { StatusCode = StatusCodes.Status500InternalServerError };
+            }
+        }
+
+        [Authorize]
+        [HttpPost("create-stripe-session")]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<ApiResponse>> CreateStripeSession([FromBody] StripeRequest stripeRequest)
+        {
+            try
+            {
+                var options = new Stripe.Checkout.SessionCreateOptions
+                {
+                    SuccessUrl = stripeRequest.ApprovedUrl,
+                    CancelUrl = stripeRequest.CancelledUrl,
+                    LineItems = new List<Stripe.Checkout.SessionLineItemOptions>(),
+                    Mode = "payment",
+                };
+
+                foreach (var lineItem in stripeRequest.OrderHeaderDto.OrderDetails)
+                {
+                    var sessionLineItem = new SessionLineItemOptions
+                    {
+                        PriceData = new SessionLineItemPriceDataOptions
+                        {
+                            UnitAmount = (long)(lineItem.Price * 100), // e.g. $20.99 - > 2099
+                            Currency = "usd",
+                            ProductData = new SessionLineItemPriceDataProductDataOptions
+                            {
+                                Name = lineItem.ProductName
+                            }
+                        },
+                        Quantity = lineItem.Count
+                    };
+                    options.LineItems.Add(sessionLineItem);
+                }
+
+                var service = new Stripe.Checkout.SessionService();
+                Session stripeSession = service.Create(options);
+                stripeRequest.StripeSessionUrl = stripeSession.Url;
+                OrderHeader orderHeader = _db.OrderHeaders.First(x => x.OrderHeaderId == stripeRequest.OrderHeaderDto.OrderHeaderId);
+                orderHeader.StripeSessionId = stripeSession.Id;
+                await _db.SaveChangesAsync();
+
+                return Ok(
+                    new ApiResponse
+                    {
+                        IsSuccess = true,
+                        Result = stripeRequest,
+                        StatusCode = System.Net.HttpStatusCode.OK
                     });
             }
             catch (Exception ex)
