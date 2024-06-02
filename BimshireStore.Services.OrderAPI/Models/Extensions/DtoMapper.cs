@@ -31,6 +31,20 @@ namespace BimshireStore.Services.OrderAPI.Models.Extensions
             };
         }
 
+        public static OrderHeaderDto ToDto(this CartHeaderDto cartHeaderDto)
+        {
+            return new OrderHeaderDto
+            {
+                UserId = cartHeaderDto.UserId,
+                Name = cartHeaderDto.Name,
+                Phone = cartHeaderDto.Phone,
+                Email = cartHeaderDto.Email,
+                CouponCode = cartHeaderDto.CouponCode,
+                Discount = cartHeaderDto.Discount,
+                OrderTotal = cartHeaderDto.CartTotal,
+            };
+        }
+
         public static OrderDetailDto ToDto(this OrderDetail orderDetail)
         {
             return new OrderDetailDto
@@ -39,9 +53,21 @@ namespace BimshireStore.Services.OrderAPI.Models.Extensions
                 OrderHeaderId = orderDetail.OrderHeaderId,
                 ProductId = orderDetail.ProductId,
                 Product = orderDetail.Product,
-                ProductName = orderDetail.ProductName,
+                ProductName = orderDetail.Product?.Name ?? string.Empty,
                 Price = orderDetail.Price,
                 Count = orderDetail.Count,
+            };
+        }
+
+        public static OrderDetailDto ToDto(this CartDetailDto cartDetailDto)
+        {
+            return new OrderDetailDto
+            {
+                ProductId = cartDetailDto.ProductId,
+                Product = cartDetailDto.Product,
+                ProductName = cartDetailDto.Product?.Name ?? string.Empty,
+                Price = cartDetailDto.Product?.Price ?? 0,
+                Count = cartDetailDto.Count,
             };
         }
     }
