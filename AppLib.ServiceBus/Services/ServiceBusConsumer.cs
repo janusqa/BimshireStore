@@ -30,7 +30,7 @@ namespace AppLib.ServiceBus.Services
             _lock = new();
         }
 
-        public void Init(Func<string, Task> ProcessMessage, string queueName)
+        public void InitQueue(Func<string, Task> ProcessMessage, string queueName)
         {
             lock (_lock)
             {
@@ -40,12 +40,34 @@ namespace AppLib.ServiceBus.Services
 
                 var consumer = new EventingBasicConsumer(_channel);
                 var handler = CreateEventHandler(ProcessMessage);
+
                 consumer.Received += handler;
 
                 _consumers[queueName] = consumer;
                 _handlers[queueName] = handler;
 
                 _channel.BasicConsume(queueName, false, _consumers[queueName]);
+            }
+        }
+
+        public void InitExchange(Func<string, Task> ProcessMessage, string exchangeName)
+        {
+            lock (_lock)
+            {
+                if (_consumers.ContainsKey(exchangeName)) throw new InvalidOperationException($"Queue '{exchangeName}' is already exist.");
+
+                _channel.ExchangeDeclare(exchangeName, ExchangeType.Fanout, durable: false);
+
+                var queueName = _channel.QueueDeclare().QueueName;
+                var consumer = new EventingBasicConsumer(_channel);
+                var handler = CreateEventHandler(ProcessMessage);
+
+                consumer.Received += handler;
+
+                _consumers[exchangeName] = consumer;
+                _handlers[exchangeName] = handler;
+
+                _channel.BasicConsume(queueName, false, _consumers[exchangeName]);
             }
         }
 

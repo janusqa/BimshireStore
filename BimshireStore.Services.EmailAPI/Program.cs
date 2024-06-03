@@ -84,6 +84,7 @@ builder.Services.AddSingleton<IServiceBusConsumer>(x =>
 // });
 builder.Services.AddHostedService<ServiceBusConsumer_EmailCart>();
 builder.Services.AddHostedService<ServiceBusConsumer_RegisterUser>();
+builder.Services.AddHostedService<ServiceBusConsumer_OrderApprovedExchange>();
 
 builder.Services.AddControllers();
 

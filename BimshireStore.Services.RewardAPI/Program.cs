@@ -3,6 +3,8 @@ using AppLib.ServiceBus.Services;
 using AppLib.ServiceBus.Services.IService;
 using BimshireStore.Services.RewardAPI.Data;
 using BimshireStore.Services.RewardAPI.Models;
+using BimshireStore.Services.RewardAPI.Services;
+using BimshireStore.Services.RewardAPI.Services.IService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
@@ -63,6 +65,7 @@ builder.Services.AddAuthorizationBuilder();
 
 // Other Services
 builder.Services.AddScoped<IDbInitializer, DbInitializer>();
+builder.Services.AddScoped<IRewardService, RewardService>();
 builder.Services.AddSingleton<IServiceBusConsumer>(x =>
     new ServiceBusConsumer(
         builder.Configuration.GetValue<string>("MessageBus:host") ?? throw new InvalidOperationException("Invalid MessageBus Host"),
@@ -70,6 +73,15 @@ builder.Services.AddSingleton<IServiceBusConsumer>(x =>
         builder.Configuration.GetValue<string>("MessageBus:pid") ?? throw new InvalidOperationException("Invalid MessageBus PID")
     )
 );
+
+// Configure Hosted Services
+// builder.Services.Configure<HostOptions>(x =>
+// {
+//     x.ServicesStartConcurrently = true;
+//     x.ServicesStopConcurrently = true;
+//     x.StartupTimeout = TimeSpan.FromSeconds(10);
+// });
+builder.Services.AddHostedService<ServiceBusConsumer_OrderApprovedExchange>();
 
 builder.Services.AddControllers();
 

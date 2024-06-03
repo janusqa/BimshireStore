@@ -199,14 +199,15 @@ namespace BimshireStore.Services.OrderAPI.Controllers
 
                         var reward = new RewardDto
                         {
-                            OrderId = orderHeader.OrderHeaderId,
                             UserId = orderHeader.UserId,
-                            RewardActivity = (int)Math.Floor(orderHeader.OrderTotal) // 1 reward point per dollar
+                            OrderId = orderHeader.OrderHeaderId,
+                            RewardActivity = (int)Math.Floor(orderHeader.OrderTotal), // 1 reward point per dollar
+                            RewardDate = DateTime.UtcNow
                         };
 
                         _sbp.SendMessageToExchange(
                             reward,
-                            _config.GetValue<string>("MessageBus:TopicAndQueueNames:OrderExchange")
+                            _config.GetValue<string>("MessageBus:TopicAndQueueNames:OrderApprovedExchange")
                                 ?? throw new InvalidOperationException("Invalid MessageBus Topic/Queue Name")
                         );
 

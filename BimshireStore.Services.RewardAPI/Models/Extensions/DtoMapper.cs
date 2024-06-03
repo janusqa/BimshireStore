@@ -17,6 +17,8 @@ namespace BimshireStore.Services.RewardAPI.Models.Extensions
             {
                 UserId = reward.UserId,
                 OrderId = reward.OrderId,
+                RewardActivity = reward.RewardActivity,
+                RewardDate = reward.RewardDate,
             };
         }
     }

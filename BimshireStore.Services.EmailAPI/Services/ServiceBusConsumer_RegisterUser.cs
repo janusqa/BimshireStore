@@ -1,7 +1,6 @@
 
 using System.Text.Json;
 using AppLib.ServiceBus.Services.IService;
-using BimshireStore.Services.EmailAPI.Models.Dto;
 using BimshireStore.Services.EmailAPI.Services.IService;
 using static BimshireStore.Services.ShoppingCartAPI.Utility.SD;
 
@@ -30,7 +29,7 @@ namespace BimshireStore.Services.EmailAPI.Services
         public Task StartAsync(CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            _sbc.Init(ProcessMessage, _queueName);
+            _sbc.InitQueue(ProcessMessage, _queueName);
             return Task.CompletedTask;
         }
 
