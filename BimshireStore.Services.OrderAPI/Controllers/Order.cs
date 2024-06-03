@@ -122,6 +122,20 @@ namespace BimshireStore.Services.OrderAPI.Controllers
                     options.LineItems.Add(sessionLineItem);
                 }
 
+                if (stripeRequest.OrderHeaderDto.Discount > 0)
+                {
+                    // Apply any discounts
+                    var Discounts = new List<SessionDiscountOptions>()
+                    {
+                        new SessionDiscountOptions
+                        {
+                            Coupon = stripeRequest.OrderHeaderDto.CouponCode
+                        }
+                    };
+
+                    options.Discounts = Discounts;
+                }
+
                 var service = new Stripe.Checkout.SessionService();
                 Session stripeSession = service.Create(options);
                 stripeRequest.StripeSessionUrl = stripeSession.Url;
