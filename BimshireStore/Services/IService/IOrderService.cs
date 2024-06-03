@@ -6,5 +6,6 @@ namespace BimshireStore.Services.IService
     {
         Task<ApiResponse?> CreateOrder(CartDto cart);
         Task<ApiResponse?> CreateStripeSession(StripeRequest stripeRequest);
+        Task<ApiResponse?> ValidateStripeSession(int orderHeaderId);
     }
 }

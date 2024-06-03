@@ -31,5 +31,15 @@ namespace BimshireStore.Services
                 Url = $"{SD.OrderApiBaseAddress}api/orders/create-stripe-session"
             });
         }
+
+        public async Task<ApiResponse?> ValidateStripeSession(int orderHeaderId)
+        {
+            return await _bs.SendAsync(new ApiRequest
+            {
+                ApiMethod = SD.ApiMethod.POST,
+                Data = orderHeaderId,
+                Url = $"{SD.OrderApiBaseAddress}api/orders/validate-stripe-session"
+            });
+        }
     }
 }

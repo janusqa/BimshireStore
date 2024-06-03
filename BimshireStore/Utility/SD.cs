@@ -33,6 +33,14 @@ namespace BimshireStore.Utility
         public const string Role_Admin = "Admin";
         public const string Role_Employee = "Employee";
 
+        // Order Statuses
+        public const string Status_Pending = "Pending";
+        public const string Status_Approved = "Approved";
+        public const string Status_ReadyForPickup = "ReadyForPickup";
+        public const string Status_Completed = "Completed";
+        public const string Status_Refunded = "Refunded";
+        public const string Status_Cancelled = "Cancelled";
+
         public static class JsonSerializerConfig
         {
             public static readonly JsonSerializerOptions DefaultOptions = new() { PropertyNameCaseInsensitive = true };

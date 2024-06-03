@@ -156,8 +156,28 @@ namespace BimshireStore.Controllers
         [HttpGet]
         public async Task<IActionResult> Confirmation(int orderId)
         {
+            var response = await _orderService.ValidateStripeSession(orderId);
+            if (response is not null && response.IsSuccess)
+            {
+                var orderHeader = JsonSerializer.Deserialize<OrderHeaderDto>(JsonSerializer.Serialize(response.Result), SD.JsonSerializerConfig.DefaultOptions);
+                if (orderHeader?.Status == SD.Status_Approved)
+                {
+                    return View(orderId);
+                }
+            }
+
+            var reason = response?.ErrorMessages?.Count > 0 ? string.Join(" | ", response.ErrorMessages) : "Unknown";
+            TempData["error"] = $"Order failed for reason: {reason}";
+
+            return RedirectToAction(nameof(OrderFail), "Cart");
+        }
+
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> OrderFail()
+        {
             await Task.CompletedTask;
-            return View(orderId);
+            return View();
         }
 
         private async Task<CartDto> GetCartByUserIdAsync()
