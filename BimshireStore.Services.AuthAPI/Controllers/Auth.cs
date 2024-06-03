@@ -48,7 +48,7 @@ namespace BimshireStore.Services.AuthAPI.Controllers
                 { StatusCode = StatusCodes.Status400BadRequest };
             }
 
-            _sbp.SendMessage(
+            _sbp.SendMessageToQueue(
                 request.UserName,
                 _config.GetValue<string>("MessageBus:TopicAndQueueNames:RegisterUserQueue")
                     ?? throw new InvalidOperationException("Invalid MessageBus Topic/Queue Name")

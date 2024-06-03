@@ -20,7 +20,7 @@ namespace Mango.Services.EmailAPI.Services
             StringBuilder message = new();
 
             message.AppendLine("<br/>Cart Email Requested");
-            message.AppendLine($"<br/>Total {cart.CartHeader.CartTotal}");
+            message.AppendLine($"<br/>Total {cart.CartHeader.CartTotal.ToString("c")}");
             message.Append("<br/>");
             if (cart.CartDetail?.Count() > 0)
             {

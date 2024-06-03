@@ -1,4 +1,5 @@
 using System.Text.Json;
+using AppLib.ServiceBus.Services.IService;
 using BimshireStore.Services.OrderAPI.Data;
 using BimshireStore.Services.OrderAPI.Models;
 using BimshireStore.Services.OrderAPI.Models.Dto;
@@ -17,11 +18,15 @@ namespace BimshireStore.Services.OrderAPI.Controllers
     {
         private readonly ApplicationDbContext _db;
         private readonly IProductService _productService;
+        private readonly IConfiguration _config;
+        private readonly IServiceBusProducer _sbp;
 
-        public OrderController(ApplicationDbContext db, IProductService productService)
+        public OrderController(ApplicationDbContext db, IProductService productService, IConfiguration config, IServiceBusProducer sbp)
         {
             _db = db;
             _productService = productService;
+            _config = config;
+            _sbp = sbp;
         }
 
         [Authorize]
@@ -191,6 +196,20 @@ namespace BimshireStore.Services.OrderAPI.Controllers
                         orderHeader.PaymentIntentId = paymentIntent.Id;
                         orderHeader.Status = SD.Status_Approved;
                         await _db.SaveChangesAsync();
+
+                        var reward = new RewardDto
+                        {
+                            OrderId = orderHeader.OrderHeaderId,
+                            UserId = orderHeader.UserId,
+                            RewardActivity = (int)Math.Floor(orderHeader.OrderTotal) // 1 reward point per dollar
+                        };
+
+                        _sbp.SendMessageToExchange(
+                            reward,
+                            _config.GetValue<string>("MessageBus:TopicAndQueueNames:OrderExchange")
+                                ?? throw new InvalidOperationException("Invalid MessageBus Topic/Queue Name")
+                        );
+
                         return Ok(
                             new ApiResponse
                             {

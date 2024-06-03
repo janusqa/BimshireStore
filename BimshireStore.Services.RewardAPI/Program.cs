@@ -1,4 +1,6 @@
 using System.Text;
+using AppLib.ServiceBus.Services;
+using AppLib.ServiceBus.Services.IService;
 using BimshireStore.Services.RewardAPI.Data;
 using BimshireStore.Services.RewardAPI.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -61,6 +63,13 @@ builder.Services.AddAuthorizationBuilder();
 
 // Other Services
 builder.Services.AddScoped<IDbInitializer, DbInitializer>();
+builder.Services.AddSingleton<IServiceBusConsumer>(x =>
+    new ServiceBusConsumer(
+        builder.Configuration.GetValue<string>("MessageBus:host") ?? throw new InvalidOperationException("Invalid MessageBus Host"),
+        builder.Configuration.GetValue<string>("MessageBus:uid") ?? throw new InvalidOperationException("Invalid MessageBus UID"),
+        builder.Configuration.GetValue<string>("MessageBus:pid") ?? throw new InvalidOperationException("Invalid MessageBus PID")
+    )
+);
 
 builder.Services.AddControllers();
 

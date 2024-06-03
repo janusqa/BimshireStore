@@ -332,7 +332,7 @@ namespace BimshireStore.Services.ShoppingCartAPI.Controllers
         {
             try
             {
-                _sbp.SendMessage(
+                _sbp.SendMessageToQueue(
                     cart,
                     _config.GetValue<string>("MessageBus:TopicAndQueueNames:EmailCartQueue")
                         ?? throw new InvalidOperationException("Invalid MessageBus Topic/Queue Name")

@@ -6,7 +6,7 @@ namespace BimshireStore.Services.OrderAPI.Models
     {
         [Key]
         public int OrderHeaderId { get; set; }
-        public string? UserId { get; set; }
+        public required string UserId { get; set; }
         [Required]
         public string? Name { get; set; }
         [Required]

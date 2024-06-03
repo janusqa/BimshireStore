@@ -24,7 +24,7 @@ namespace AppLib.ServiceBus.Services
             _channel = _connection.CreateModel();
         }
 
-        public void SendMessage(object message, string queueName)
+        public void SendMessageToQueue(object message, string queueName)
         {
             try
             {
@@ -32,6 +32,21 @@ namespace AppLib.ServiceBus.Services
                 var jsonMessage = JsonSerializer.Serialize(message);
                 var body = Encoding.UTF8.GetBytes(jsonMessage);
                 _channel.BasicPublish(exchange: "", routingKey: queueName, null, body: body);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error sending message to ServiceBus: {ex.Message}");
+            }
+        }
+
+        public void SendMessageToExchange(object message, string exchangeName)
+        {
+            try
+            {
+                _channel.ExchangeDeclare(exchangeName, ExchangeType.Fanout, durable: false);
+                var jsonMessage = JsonSerializer.Serialize(message);
+                var body = Encoding.UTF8.GetBytes(jsonMessage);
+                _channel.BasicPublish(exchange: exchangeName, routingKey: "", null, body: body);
             }
             catch (Exception ex)
             {

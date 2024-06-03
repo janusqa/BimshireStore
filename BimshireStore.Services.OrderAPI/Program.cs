@@ -1,4 +1,6 @@
 using System.Text;
+using AppLib.ServiceBus.Services;
+using AppLib.ServiceBus.Services.IService;
 using BimshireStore.Services.OrderAPI.Data;
 using BimshireStore.Services.OrderAPI.Models;
 using BimshireStore.Services.OrderAPI.Services;
@@ -68,8 +70,13 @@ builder.Services.AddScoped<IHttpRequestMessageBuilder, HttpRequestMessageBuilder
 builder.Services.AddScoped<IBaseService, BaseService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddTransient<ServiceAccount>(); // NOTE REGISTERED AS TRANSIENT
-
-
+builder.Services.AddScoped<IServiceBusProducer>(x =>
+    new ServiceBusProducer(
+        builder.Configuration.GetValue<string>("MessageBus:host") ?? throw new InvalidOperationException("Invalid MessageBus Host"),
+        builder.Configuration.GetValue<string>("MessageBus:uid") ?? throw new InvalidOperationException("Invalid MessageBus UID"),
+        builder.Configuration.GetValue<string>("MessageBus:pid") ?? throw new InvalidOperationException("Invalid MessageBus PID")
+    )
+);
 // API URIs
 SD.ProductApiBaseAddress = builder.Configuration["ServiceUris:ProductApi"]
     ?? throw new InvalidOperationException("Invalid ProductAPI base Address");
