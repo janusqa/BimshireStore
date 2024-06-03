@@ -62,6 +62,8 @@ builder.Services.AddAuthorizationBuilder();
 // Other Services
 builder.Services.AddScoped<IDbInitializer, DbInitializer>();
 
+// Stripe.net
+Stripe.StripeConfiguration.ApiKey = builder.Configuration.GetSection("Stripe:SecretKey").Get<string>() ?? throw new InvalidOperationException("Stripe SecretKey not found");
 
 builder.Services.AddControllers();
 

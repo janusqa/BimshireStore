@@ -164,6 +164,16 @@ namespace BimshireStore.Services.CouponAPI.Controllers
                 await _db.Coupons.AddAsync(coupon);
                 await _db.SaveChangesAsync();
 
+                var options = new Stripe.CouponCreateOptions
+                {
+                    AmountOff = (long)(coupon.DiscountAmount * 100),
+                    Name = coupon.CouponCode,
+                    Currency = "usd",
+                    Id = coupon.CouponCode
+                };
+                var service = new Stripe.CouponService();
+                await service.CreateAsync(options);
+
                 return Ok(
                     new ApiResponse
                     {
@@ -251,6 +261,8 @@ namespace BimshireStore.Services.CouponAPI.Controllers
                     _db.Coupons.Remove(coupon);
                     await _db.SaveChangesAsync();
 
+                    var service = new Stripe.CouponService();
+                    await service.DeleteAsync(coupon.CouponCode);
 
                     return Ok(
                         new ApiResponse

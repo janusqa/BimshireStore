@@ -269,7 +269,7 @@ namespace BimshireStore.Services.ShoppingCartAPI.Controllers
         {
             try
             {
-                if (cart.CartHeader.CouponCode is not null)
+                if (!string.IsNullOrWhiteSpace(cart.CartHeader.CouponCode))
                 {
                     var couponApiresponse = await _cs.GetByCodeAsync(cart.CartHeader.CouponCode);
                     if (couponApiresponse is null || !couponApiresponse.IsSuccess)
@@ -296,7 +296,7 @@ namespace BimshireStore.Services.ShoppingCartAPI.Controllers
                         new ApiResponse
                         {
                             IsSuccess = true,
-                            StatusCode = System.Net.HttpStatusCode.NotFound
+                            StatusCode = System.Net.HttpStatusCode.OK
                         });
                 }
                 return NotFound(

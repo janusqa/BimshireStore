@@ -17,9 +17,6 @@ namespace BimshireStore.Services.ShoppingCartAPI.Models.Extensions
             {
                 CartHeaderId = cartHeader.CartHeaderId,
                 UserId = cartHeader.UserId,
-                Name = cartHeader.Name,
-                Phone = cartHeader.Phone,
-                Email = cartHeader.Email,
                 CouponCode = cartHeader.CouponCode,
                 Discount = cartHeader.Discount,
                 CartTotal = cartHeader.CartTotal,

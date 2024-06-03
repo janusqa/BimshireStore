@@ -115,7 +115,7 @@ namespace BimshireStore.Services.OrderAPI.Controllers
                             ProductData = new SessionLineItemPriceDataProductDataOptions
                             {
                                 Name = lineItem.ProductName
-                            }
+                            },
                         },
                         Quantity = lineItem.Count
                     };

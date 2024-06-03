@@ -50,6 +50,7 @@ namespace BimshireStore.Controllers
         [HttpPost]
         public async Task<IActionResult> ApplyCoupon(CartDto cart)
         {
+
             var response = await _cartService.ApplyCouponAsync(cart);
             if (response is not null && response.IsSuccess)
             {
@@ -68,6 +69,7 @@ namespace BimshireStore.Controllers
         public async Task<IActionResult> RemoveCoupon(CartDto cart)
         {
             cart.CartHeader.CouponCode = null;
+
             var response = await _cartService.ApplyCouponAsync(cart);
             if (response is not null && response.IsSuccess)
             {

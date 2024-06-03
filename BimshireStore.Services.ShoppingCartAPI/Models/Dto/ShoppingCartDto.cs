@@ -6,11 +6,8 @@ namespace BimshireStore.Services.ShoppingCartAPI.Models.Dto
     {
         public int CartHeaderId { get; set; }
         public string? UserId { get; set; }
-        [Required]
         public string? Name { get; set; }
-        [Required]
         public string? Phone { get; set; }
-        [Required]
         public string? Email { get; set; }
         public string? CouponCode { get; set; }
         public double Discount { get; set; }
@@ -30,6 +27,6 @@ namespace BimshireStore.Services.ShoppingCartAPI.Models.Dto
     public record CartDto
     {
         public required CartHeaderDto CartHeader { get; set; }
-        public IEnumerable<CartDetailDto> CartDetail { get; set; } = [];
+        public IEnumerable<CartDetailDto>? CartDetail { get; set; }
     }
 }
