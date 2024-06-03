@@ -2,7 +2,7 @@ using System.Net;
 using System.Text.Json;
 using BimshireStore.Services.OrderAPI.Models.Dto;
 using BimshireStore.Services.OrderAPI.Services.IService;
-using static BimshireStore.Services.OrderAPI.Utility.SD;
+using BimshireStore.Services.OrderAPI.Utility;
 
 namespace BimshireStore.Services.OrderAPI.Services
 {
@@ -42,7 +42,7 @@ namespace BimshireStore.Services.OrderAPI.Services
                         return new ApiResponse { IsSuccess = false, ErrorMessages = ["Internal Server Error"], StatusCode = responseMessage.StatusCode };
                     default:
                         var jsonResponse = await responseMessage.Content.ReadAsStringAsync();
-                        var apiResponse = JsonSerializer.Deserialize<ApiResponse>(jsonResponse, JsonSerializerConfig.DefaultOptions);
+                        var apiResponse = JsonSerializer.Deserialize<ApiResponse>(jsonResponse, SD.JsonSerializerConfig.DefaultOptions);
                         return apiResponse;
                 }
             }

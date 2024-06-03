@@ -7,7 +7,6 @@ using BimshireStore.Services.OrderAPI.Services.IService;
 using BimshireStore.Services.OrderAPI.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using static BimshireStore.Services.OrderAPI.Utility.SD;
 
 namespace BimshireStore.Services.OrderAPI.Controllers
 {
@@ -42,7 +41,7 @@ namespace BimshireStore.Services.OrderAPI.Controllers
                 orderHeaderDto.Status = SD.Status_Pending;
                 orderHeaderDto.OrderDetails = cart.CartDetail?.Select(x => x.ToDto()) ?? [];
 
-                var orderHeader = JsonSerializer.Deserialize<OrderHeader>(JsonSerializer.Serialize(orderHeaderDto), JsonSerializerConfig.DefaultOptions);
+                var orderHeader = JsonSerializer.Deserialize<OrderHeader>(JsonSerializer.Serialize(orderHeaderDto), SD.JsonSerializerConfig.DefaultOptions);
 
                 if (orderHeader is not null)
                 {
@@ -186,7 +185,7 @@ namespace BimshireStore.Services.OrderAPI.Controllers
 
                     var paymentIntentService = new Stripe.PaymentIntentService();
                     var paymentIntent = await paymentIntentService.GetAsync(stripeSession.PaymentIntentId);
-                    if (paymentIntent.Status == "succeeded")
+                    if (paymentIntent is not null && paymentIntent.Status == "succeeded")
                     {
                         // payment was successful
                         orderHeader.PaymentIntentId = paymentIntent.Id;
@@ -207,7 +206,7 @@ namespace BimshireStore.Services.OrderAPI.Controllers
                             new ApiResponse
                             {
                                 IsSuccess = false,
-                                ErrorMessages = [$"Payment failed: {paymentIntent.Status}"],
+                                ErrorMessages = [$"Payment failed: {paymentIntent?.Status}"],
                                 StatusCode = System.Net.HttpStatusCode.BadRequest
                             }
                         );
