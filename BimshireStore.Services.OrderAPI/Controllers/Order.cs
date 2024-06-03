@@ -7,7 +7,6 @@ using BimshireStore.Services.OrderAPI.Services.IService;
 using BimshireStore.Services.OrderAPI.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Stripe.Checkout;
 using static BimshireStore.Services.OrderAPI.Utility.SD;
 
 namespace BimshireStore.Services.OrderAPI.Controllers
@@ -106,13 +105,13 @@ namespace BimshireStore.Services.OrderAPI.Controllers
 
                 foreach (var lineItem in stripeRequest.OrderHeaderDto.OrderDetails)
                 {
-                    var sessionLineItem = new SessionLineItemOptions
+                    var sessionLineItem = new Stripe.Checkout.SessionLineItemOptions
                     {
-                        PriceData = new SessionLineItemPriceDataOptions
+                        PriceData = new Stripe.Checkout.SessionLineItemPriceDataOptions
                         {
                             UnitAmount = (long)(lineItem.Price * 100), // e.g. $20.99 - > 2099
                             Currency = "usd",
-                            ProductData = new SessionLineItemPriceDataProductDataOptions
+                            ProductData = new Stripe.Checkout.SessionLineItemPriceDataProductDataOptions
                             {
                                 Name = lineItem.ProductName
                             },
@@ -125,9 +124,9 @@ namespace BimshireStore.Services.OrderAPI.Controllers
                 if (stripeRequest.OrderHeaderDto.Discount > 0)
                 {
                     // Apply any discounts
-                    var Discounts = new List<SessionDiscountOptions>()
+                    var Discounts = new List<Stripe.Checkout.SessionDiscountOptions>()
                     {
-                        new SessionDiscountOptions
+                        new Stripe.Checkout.SessionDiscountOptions
                         {
                             Coupon = stripeRequest.OrderHeaderDto.CouponCode
                         }
@@ -137,7 +136,7 @@ namespace BimshireStore.Services.OrderAPI.Controllers
                 }
 
                 var service = new Stripe.Checkout.SessionService();
-                Session stripeSession = service.Create(options);
+                Stripe.Checkout.Session stripeSession = service.Create(options);
                 stripeRequest.StripeSessionUrl = stripeSession.Url;
                 OrderHeader orderHeader = _db.OrderHeaders.First(x => x.OrderHeaderId == stripeRequest.OrderHeaderDto.OrderHeaderId);
                 orderHeader.StripeSessionId = stripeSession.Id;
@@ -150,6 +149,78 @@ namespace BimshireStore.Services.OrderAPI.Controllers
                         Result = stripeRequest,
                         StatusCode = System.Net.HttpStatusCode.OK
                     });
+            }
+            catch (Exception ex)
+            {
+                return new ObjectResult(
+                    new ApiResponse
+                    {
+                        IsSuccess = false,
+                        Result = null,
+                        ErrorMessages = [ex.Message],
+                        StatusCode = System.Net.HttpStatusCode.InternalServerError
+                    }
+                )
+                { StatusCode = StatusCodes.Status500InternalServerError };
+            }
+        }
+
+        [Authorize]
+        [HttpPost("validate-stripe-session")]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<ApiResponse>> ValidateStripeSession([FromBody] int orderHeaderId)
+        {
+            try
+            {
+                OrderHeader orderHeader = _db.OrderHeaders.First(x => x.OrderHeaderId == orderHeaderId);
+
+                if (orderHeader is not null)
+                {
+                    var service = new Stripe.Checkout.SessionService();
+                    Stripe.Checkout.Session stripeSession = await service.GetAsync(orderHeader.StripeSessionId);
+
+                    var paymentIntentService = new Stripe.PaymentIntentService();
+                    var paymentIntent = await paymentIntentService.GetAsync(stripeSession.PaymentIntentId);
+                    if (paymentIntent.Status == "succeeded")
+                    {
+                        // payment was successful
+                        orderHeader.PaymentIntentId = paymentIntent.Id;
+                        orderHeader.Status = SD.Status_Approved;
+                        await _db.SaveChangesAsync();
+                        return Ok(
+                            new ApiResponse
+                            {
+                                IsSuccess = true,
+                                Result = orderHeader.ToDto(),
+                                StatusCode = System.Net.HttpStatusCode.OK
+                            }
+                        );
+                    }
+                    else
+                    {
+                        return BadRequest(
+                            new ApiResponse
+                            {
+                                IsSuccess = false,
+                                ErrorMessages = [$"Payment failed: {paymentIntent.Status}"],
+                                StatusCode = System.Net.HttpStatusCode.BadRequest
+                            }
+                        );
+                    }
+                }
+                return BadRequest(
+                    new ApiResponse
+                    {
+                        IsSuccess = false,
+                        ErrorMessages = ["Payment failed"],
+                        StatusCode = System.Net.HttpStatusCode.BadRequest
+                    }
+                );
             }
             catch (Exception ex)
             {
