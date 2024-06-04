@@ -8,6 +8,7 @@ using BimshireStore.Services.OrderAPI.Services.IService;
 using BimshireStore.Services.OrderAPI.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace BimshireStore.Services.OrderAPI.Controllers
 {
@@ -27,6 +28,98 @@ namespace BimshireStore.Services.OrderAPI.Controllers
             _productService = productService;
             _config = config;
             _sbp = sbp;
+        }
+
+        [Authorize]
+        [HttpGet("")]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<ApiResponse>> GetAll([FromQuery] string? userId)
+        {
+            try
+            {
+                IEnumerable<OrderHeader> orderHeaders;
+                if (User.IsInRole(SD.Role_Admin))
+                {
+                    orderHeaders = await _db.OrderHeaders.Include(x => x.OrderDetails).OrderByDescending(x => x.OrderHeaderId).ToListAsync();
+                }
+                else
+                {
+                    orderHeaders = await _db.OrderHeaders.Include(x => x.OrderDetails).Where(x => x.UserId == userId).OrderByDescending(x => x.OrderHeaderId).ToListAsync();
+                }
+                return Ok(
+                    new ApiResponse
+                    {
+                        IsSuccess = true,
+                        Result = orderHeaders.Select(x => x.ToDto()),
+                        StatusCode = System.Net.HttpStatusCode.OK
+                    });
+            }
+            catch (Exception ex)
+            {
+                return new ObjectResult(
+                    new ApiResponse
+                    {
+                        IsSuccess = false,
+                        Result = null,
+                        ErrorMessages = [ex.Message],
+                        StatusCode = System.Net.HttpStatusCode.InternalServerError
+                    }
+                )
+                { StatusCode = StatusCodes.Status500InternalServerError };
+            }
+        }
+
+        [Authorize]
+        [HttpGet("Id:int")]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<ApiResponse>> GetById([FromRoute] int Id)
+        {
+            try
+            {
+                var orderHeader = await _db.OrderHeaders.Include(x => x.OrderDetails).FirstOrDefaultAsync(x => x.OrderHeaderId == Id);
+
+                if (orderHeader is not null)
+                {
+                    return Ok(
+                        new ApiResponse
+                        {
+                            IsSuccess = true,
+                            Result = orderHeader.ToDto(),
+                            StatusCode = System.Net.HttpStatusCode.OK
+                        });
+                }
+
+                return NotFound(
+                    new ApiResponse
+                    {
+                        IsSuccess = false,
+                        ErrorMessages = ["Order not found"],
+                        StatusCode = System.Net.HttpStatusCode.NotFound
+                    });
+            }
+            catch (Exception ex)
+            {
+                return new ObjectResult(
+                    new ApiResponse
+                    {
+                        IsSuccess = false,
+                        Result = null,
+                        ErrorMessages = [ex.Message],
+                        StatusCode = System.Net.HttpStatusCode.InternalServerError
+                    }
+                )
+                { StatusCode = StatusCodes.Status500InternalServerError };
+            }
         }
 
         [Authorize]
