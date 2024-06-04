@@ -11,10 +11,12 @@ namespace AppLib.ServiceBus.Services
         private readonly IModel _channel;
         private readonly Dictionary<string, EventingBasicConsumer> _consumers;
         private readonly Dictionary<string, EventHandler<BasicDeliverEventArgs>> _handlers;
+        private (string DLX, string DLQ) _deadLetter;
+        private readonly Dictionary<string, object> _queueArgs;
         private bool _disposed = false;
         private readonly object _lock;
 
-        public ServiceBusConsumer(string hostname, string username, string password)
+        public ServiceBusConsumer(string hostname, string username, string password, string exchangeDeadLetter, string queueDeadLetter)
         {
             var factory = new ConnectionFactory
             {
@@ -23,11 +25,26 @@ namespace AppLib.ServiceBus.Services
                 Password = password
             };
 
+            _deadLetter = (exchangeDeadLetter, queueDeadLetter);
+            _queueArgs = new Dictionary<string, object>
+            {
+                { "x-dead-letter-exchange", _deadLetter.DLX },
+                { "x-queue-type", "quorum" },
+                { "x-delivery-limit", 3 }
+            };
+
             _connection = factory.CreateConnection();
             _channel = _connection.CreateModel();
             _consumers = [];
             _handlers = [];
             _lock = new();
+
+            // Dead letter exchange to collect failed messages for later manual examination
+            // we could set up a consumer for this if we want. Only enable the below on consumers
+            // ***
+            _channel.ExchangeDeclare(exchange: _deadLetter.DLX, type: ExchangeType.Fanout, durable: false);
+            _channel.QueueDeclare(queue: _deadLetter.DLQ, durable: false, exclusive: false, autoDelete: false, arguments: null);
+            _channel.QueueBind(queue: _deadLetter.DLQ, exchange: _deadLetter.DLX, routingKey: "");
         }
 
         public void InitQueue(Func<string, Task> ProcessMessage, string queueName)
@@ -36,7 +53,7 @@ namespace AppLib.ServiceBus.Services
             {
                 if (_consumers.ContainsKey(queueName)) throw new InvalidOperationException($"Queue '{queueName}' already exist.");
 
-                _channel.QueueDeclare(queueName, false, false, false, null);
+                _channel.QueueDeclare(queue: queueName, durable: true, exclusive: false, autoDelete: false, arguments: _queueArgs);
 
                 var consumer = new EventingBasicConsumer(_channel);
                 var handler = CreateEventHandler(ProcessMessage);
@@ -46,7 +63,7 @@ namespace AppLib.ServiceBus.Services
                 _consumers[queueName] = consumer;
                 _handlers[queueName] = handler;
 
-                _channel.BasicConsume(queueName, false, _consumers[queueName]);
+                _channel.BasicConsume(queue: queueName, autoAck: false, consumer: _consumers[queueName]);
             }
         }
 
@@ -56,10 +73,11 @@ namespace AppLib.ServiceBus.Services
             {
                 if (_consumers.ContainsKey(exchangeName)) throw new InvalidOperationException($"Queue '{exchangeName}' already exist.");
 
-                _channel.ExchangeDeclare(exchangeName, ExchangeType.Fanout, durable: false);
+                _channel.ExchangeDeclare(exchange: exchangeName, type: ExchangeType.Fanout, durable: false);
 
-                var queueName = _channel.QueueDeclare().QueueName;
-                _channel.QueueBind(queueName, exchangeName, "");
+                var queueName = Guid.NewGuid().ToString();
+                _channel.QueueDeclare(queue: queueName, durable: true, exclusive: false, autoDelete: false, arguments: _queueArgs);
+                _channel.QueueBind(queue: queueName, exchange: exchangeName, routingKey: "");
 
                 var consumer = new EventingBasicConsumer(_channel);
                 var handler = CreateEventHandler(ProcessMessage);
@@ -69,7 +87,7 @@ namespace AppLib.ServiceBus.Services
                 _consumers[exchangeName] = consumer;
                 _handlers[exchangeName] = handler;
 
-                _channel.BasicConsume(queueName, false, _consumers[exchangeName]);
+                _channel.BasicConsume(queue: queueName, autoAck: false, consumer: _consumers[exchangeName]);
             }
         }
 
@@ -81,13 +99,13 @@ namespace AppLib.ServiceBus.Services
                 {
                     var content = Encoding.UTF8.GetString(ea.Body.ToArray());
                     await ProcessMessage(content);
-                    _channel.BasicAck(ea.DeliveryTag, false);
+                    _channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Error processing ServiceBus message: {ex.Message}");
                     // We can re-queue or better yet send to a dead letter exchange and log
-                    _channel.BasicNack(ea.DeliveryTag, false, true);
+                    _channel.BasicNack(deliveryTag: ea.DeliveryTag, multiple: false, requeue: true);
                 }
             };
         }

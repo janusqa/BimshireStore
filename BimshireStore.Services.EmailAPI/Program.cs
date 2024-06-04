@@ -71,7 +71,9 @@ builder.Services.AddSingleton<IServiceBusConsumer>(x =>
     new ServiceBusConsumer(
         builder.Configuration.GetValue<string>("MessageBus:host") ?? throw new InvalidOperationException("Invalid MessageBus Host"),
         builder.Configuration.GetValue<string>("MessageBus:uid") ?? throw new InvalidOperationException("Invalid MessageBus UID"),
-        builder.Configuration.GetValue<string>("MessageBus:pid") ?? throw new InvalidOperationException("Invalid MessageBus PID")
+        builder.Configuration.GetValue<string>("MessageBus:pid") ?? throw new InvalidOperationException("Invalid MessageBus PID"),
+        builder.Configuration.GetValue<string>("MessageBus:TopicAndQueueNames:ExchangeDeadLetter") ?? throw new InvalidOperationException("Invalid MessageBus Dead-letter Exchange"),
+        builder.Configuration.GetValue<string>("MessageBus:TopicAndQueueNames:QueueDeadLetter") ?? throw new InvalidOperationException("Invalid MessageBus Dead-letter Queue")
     )
 );
 
