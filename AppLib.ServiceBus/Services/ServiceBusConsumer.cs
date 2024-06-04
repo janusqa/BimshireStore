@@ -86,6 +86,7 @@ namespace AppLib.ServiceBus.Services
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Error processing ServiceBus message: {ex.Message}");
+                    // We can re-queue or better yet send to a dead letter exchange and log
                     _channel.BasicNack(ea.DeliveryTag, false, true);
                 }
             };
