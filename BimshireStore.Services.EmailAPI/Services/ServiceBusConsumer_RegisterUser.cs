@@ -64,7 +64,11 @@ namespace BimshireStore.Services.EmailAPI.Services
                     if (emailService is not null)
                     {
                         var email = JsonSerializer.Deserialize<string>(content, JsonSerializerConfig.DefaultOptions);
-                        if (email is not null) await emailService.RegisteredUserEmailAndLog(email);
+                        if (email is not null)
+                        {
+                            var result = await emailService.RegisteredUserEmailAndLog(email);
+                            if (result != string.Empty) throw new Exception(result);
+                        }
                     }
                 }
             }

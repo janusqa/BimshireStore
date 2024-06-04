@@ -65,7 +65,11 @@ namespace BimshireStore.Services.EmailAPI.Services
                     if (emailService is not null)
                     {
                         var cart = JsonSerializer.Deserialize<CartDto>(content, JsonSerializerConfig.DefaultOptions);
-                        if (cart is not null) await emailService.CartEmailAndLog(cart);
+                        if (cart is not null)
+                        {
+                            var result = await emailService.CartEmailAndLog(cart);
+                            if (result != string.Empty) throw new Exception(result);
+                        }
                     }
                 }
             }

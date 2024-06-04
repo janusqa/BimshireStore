@@ -65,7 +65,11 @@ namespace BimshireStore.Services.RewardAPI.Services
                     if (rewardService is not null)
                     {
                         var reward = JsonSerializer.Deserialize<RewardDto>(content, SD.JsonSerializerConfig.DefaultOptions);
-                        if (reward is not null) await rewardService.RewardLog(reward);
+                        if (reward is not null)
+                        {
+                            var result = await rewardService.RewardLog(reward);
+                            if (result != string.Empty) throw new Exception(result);
+                        }
                     }
                 }
             }

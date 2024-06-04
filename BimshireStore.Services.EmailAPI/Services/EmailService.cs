@@ -15,7 +15,7 @@ namespace Mango.Services.EmailAPI.Services
             _db = db;
         }
 
-        public async Task CartEmailAndLog(CartDto cart)
+        public async Task<string> CartEmailAndLog(CartDto cart)
         {
             StringBuilder message = new();
 
@@ -38,19 +38,26 @@ namespace Mango.Services.EmailAPI.Services
                 message.Append("<p>No items in cart.</p>");
             }
 
-            if (cart.CartHeader.Email is not null) await LogAndEmail(cart.CartHeader.Email, message.ToString());
+            if (cart.CartHeader.Email is not null)
+            {
+                return await LogAndEmail(cart.CartHeader.Email, message.ToString());
+            }
+            else
+            {
+                return string.Empty;
+            }
         }
 
-        public async Task OrderPlacedEmailAndLog(RewardDto reward)
+        public async Task<string> OrderPlacedEmailAndLog(RewardDto reward)
         {
             string message = "New Order Placed. <br/> Order ID : " + reward.OrderId;
-            await LogAndEmail("admin1@string.com", message);
+            return await LogAndEmail("admin1@string.com", message);
         }
 
-        public async Task RegisteredUserEmailAndLog(string email)
+        public async Task<string> RegisteredUserEmailAndLog(string email)
         {
             string message = $"User Registeration Successful. <br/> Email : {email}";
-            await LogAndEmail("admin1@string.com", message);
+            return await LogAndEmail("admin1@string.com", message);
         }
 
         private async Task<string> LogAndEmail(string email, string message)

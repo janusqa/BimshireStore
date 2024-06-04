@@ -80,14 +80,13 @@ namespace AppLib.ServiceBus.Services
                 try
                 {
                     var content = Encoding.UTF8.GetString(ea.Body.ToArray());
-
                     await ProcessMessage(content);
-
                     _channel.BasicAck(ea.DeliveryTag, false);
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Error processing ServiceBus message: {ex.Message}");
+                    _channel.BasicNack(ea.DeliveryTag, false, true);
                 }
             };
         }

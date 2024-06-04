@@ -4,8 +4,8 @@ namespace BimshireStore.Services.EmailAPI.Services.IService
 {
     public interface IEmailService
     {
-        Task CartEmailAndLog(CartDto cart);
-        Task RegisteredUserEmailAndLog(string email);
-        Task OrderPlacedEmailAndLog(RewardDto reward);
+        Task<string> CartEmailAndLog(CartDto cart);
+        Task<string> RegisteredUserEmailAndLog(string email);
+        Task<string> OrderPlacedEmailAndLog(RewardDto reward);
     }
 }

@@ -65,7 +65,11 @@ namespace BimshireStore.Services.EmailAPI.Services
                     if (emailService is not null)
                     {
                         var reward = JsonSerializer.Deserialize<RewardDto>(content, SD.JsonSerializerConfig.DefaultOptions);
-                        if (reward is not null) await emailService.OrderPlacedEmailAndLog(reward);
+                        if (reward is not null)
+                        {
+                            var result = await emailService.OrderPlacedEmailAndLog(reward);
+                            if (result != string.Empty) throw new Exception(result);
+                        }
                     }
                 }
             }
