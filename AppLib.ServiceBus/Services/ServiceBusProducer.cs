@@ -29,8 +29,10 @@ namespace AppLib.ServiceBus.Services
             try
             {
                 _channel.QueueDeclare(queueName, false, false, false, null);
+
                 var jsonMessage = JsonSerializer.Serialize(message);
                 var body = Encoding.UTF8.GetBytes(jsonMessage);
+
                 _channel.BasicPublish(exchange: "", routingKey: queueName, null, body: body);
             }
             catch (Exception ex)

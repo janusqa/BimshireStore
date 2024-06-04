@@ -34,7 +34,7 @@ namespace AppLib.ServiceBus.Services
         {
             lock (_lock)
             {
-                if (_consumers.ContainsKey(queueName)) throw new InvalidOperationException($"Queue '{queueName}' is already exist.");
+                if (_consumers.ContainsKey(queueName)) throw new InvalidOperationException($"Queue '{queueName}' already exist.");
 
                 _channel.QueueDeclare(queueName, false, false, false, null);
 
@@ -54,11 +54,13 @@ namespace AppLib.ServiceBus.Services
         {
             lock (_lock)
             {
-                if (_consumers.ContainsKey(exchangeName)) throw new InvalidOperationException($"Queue '{exchangeName}' is already exist.");
+                if (_consumers.ContainsKey(exchangeName)) throw new InvalidOperationException($"Queue '{exchangeName}' already exist.");
 
                 _channel.ExchangeDeclare(exchangeName, ExchangeType.Fanout, durable: false);
 
                 var queueName = _channel.QueueDeclare().QueueName;
+                _channel.QueueBind(queueName, exchangeName, "");
+
                 var consumer = new EventingBasicConsumer(_channel);
                 var handler = CreateEventHandler(ProcessMessage);
 
