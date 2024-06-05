@@ -2,6 +2,7 @@ var dataTable;
 
 $(document).ready(function () {
     var url = window.location.search;
+    console.log(url);
     if (url.includes('approved')) {
         loadDataTable('approved');
     } else {

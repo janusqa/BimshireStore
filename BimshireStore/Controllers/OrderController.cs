@@ -100,13 +100,20 @@ public class OrderController : Controller
     #region REST API 
     [Authorize]
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll(string status)
     {
         var response = await _orderService.GetAllAsync();
         if (response is not null && response.IsSuccess)
         {
             var orders = JsonSerializer.Deserialize<List<OrderHeaderDto>>(JsonSerializer.Serialize(response.Result), SD.JsonSerializerConfig.DefaultOptions);
-            return Json(new { data = orders });
+            var statusFilter = status switch
+            {
+                "approved" => SD.Status_Approved,
+                "readyforpickup" => SD.Status_ReadyForPickup,
+                "cancelled" => SD.Status_Cancelled,
+                _ => "All"
+            };
+            return Json(new { data = (statusFilter == "All" ? orders : orders?.Where(x => x.Status == statusFilter)) ?? [] });
         }
 
         return Json(new { data = new List<OrderHeaderDto>() });
