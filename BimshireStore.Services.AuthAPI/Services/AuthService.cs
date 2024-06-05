@@ -78,21 +78,21 @@ namespace BimshireStore.Services.AuthAPI.Services
             var roles = await _um.GetRolesAsync(user);
 
             // 4. Create User Claims
-            var userClaims = new List<Claim>();
+            var userClaims = new List<Claim> {
+                new (JwtRegisteredClaimNames.Sub, user.Id ?? throw new InvalidOperationException()),
+                new (JwtRegisteredClaimNames.Email, user.Email ?? throw new InvalidOperationException()),
+                new (JwtRegisteredClaimNames.Name, user.UserName ?? throw new InvalidOperationException())
+            };
+
             foreach (var role in roles)
             {
                 userClaims.Add(new Claim(ClaimTypes.Role, role));
             }
 
             // 5. Create claims identity 
-            var claimsIdentity = new ClaimsIdentity(
-            [
-                new (JwtRegisteredClaimNames.Sub, user.Id ?? throw new InvalidOperationException()),
-                new (JwtRegisteredClaimNames.Email, user.Email ?? throw new InvalidOperationException()),
-                new (JwtRegisteredClaimNames.Name, user.UserName ?? throw new InvalidOperationException()),
-            ]);
+            var claimsIdentity = new ClaimsIdentity(userClaims);
             // add additional claims createad above too
-            claimsIdentity.AddClaims(userClaims);
+            // claimsIdentity.AddClaims(userClaims);  
 
             // 6. Createeate token
             var token = _ident.CreateSecurityToken(claimsIdentity);

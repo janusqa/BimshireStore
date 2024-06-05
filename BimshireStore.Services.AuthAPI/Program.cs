@@ -61,7 +61,8 @@ builder.Services
              ValidateLifetime = true
          };
          x.Audience = jwtSettings.Audiences?[0];
-         x.ClaimsIssuer = jwtSettings.Issuer;
+         x.ClaimsIssuer = jwtSettings?.Issuer;
+         x.MapInboundClaims = false; // Microsoft remaps claims differently. Stop it!!!
      });
 
 // builder.Services.AddAuthentication().AddBearerToken(IdentityConstants.BearerScheme);

@@ -27,7 +27,7 @@ namespace BimshireStore.Services.OrderAPI.Models.Extensions
                 Status = orderHeader.Status,
                 PaymentIntentId = orderHeader.PaymentIntentId,
                 StripeSessionId = orderHeader.StripeSessionId,
-                OrderDetails = orderHeader.OrderDetails.Select(x => x.ToDto())
+                OrderDetails = orderHeader.OrderDetails?.Select(x => x.ToDto()) ?? []
             };
         }
 

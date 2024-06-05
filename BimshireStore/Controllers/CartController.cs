@@ -122,7 +122,7 @@ namespace BimshireStore.Controllers
             cart.CartHeader.Name = cartDto.CartHeader.Name;
             cart.CartHeader.Phone = cartDto.CartHeader.Phone;
 
-            var orderCreated = await _orderService.CreateOrder(cart);
+            var orderCreated = await _orderService.CreateOrderAsync(cart);
 
             if (orderCreated is not null && orderCreated.IsSuccess)
             {
@@ -138,7 +138,7 @@ namespace BimshireStore.Controllers
                         StripeSessionUrl = string.Empty
                     };
 
-                    var response = await _orderService.CreateStripeSession(stripeRequest);
+                    var response = await _orderService.CreateStripeSessionAsync(stripeRequest);
                     if (response is not null && response.IsSuccess)
                     {
                         stripeRequest = JsonSerializer.Deserialize<StripeRequest>(JsonSerializer.Serialize(response.Result), SD.JsonSerializerConfig.DefaultOptions);
@@ -156,7 +156,7 @@ namespace BimshireStore.Controllers
         [HttpGet]
         public async Task<IActionResult> Confirmation(int orderId)
         {
-            var response = await _orderService.ValidateStripeSession(orderId);
+            var response = await _orderService.ValidateStripeSessionAsync(orderId);
             if (response is not null && response.IsSuccess)
             {
                 var orderHeader = JsonSerializer.Deserialize<OrderHeaderDto>(JsonSerializer.Serialize(response.Result), SD.JsonSerializerConfig.DefaultOptions);

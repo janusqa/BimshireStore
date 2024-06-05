@@ -59,6 +59,7 @@ builder.Services.AddAuthentication(x =>
     };
     x.Audience = jwtSettings?.Audiences?[0];
     x.ClaimsIssuer = jwtSettings?.Issuer;
+    x.MapInboundClaims = false; // Microsoft remaps claims differently. Stop it!!!
 });
 
 // Authorization

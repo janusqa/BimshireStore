@@ -12,7 +12,7 @@ namespace BimshireStore.Services
         {
             _bs = bs;
         }
-        public async Task<ApiResponse?> CreateOrder(CartDto cart)
+        public async Task<ApiResponse?> CreateOrderAsync(CartDto cart)
         {
             return await _bs.SendAsync(new ApiRequest
             {
@@ -22,7 +22,7 @@ namespace BimshireStore.Services
             });
         }
 
-        public async Task<ApiResponse?> CreateStripeSession(StripeRequest stripeRequest)
+        public async Task<ApiResponse?> CreateStripeSessionAsync(StripeRequest stripeRequest)
         {
             return await _bs.SendAsync(new ApiRequest
             {
@@ -32,7 +32,34 @@ namespace BimshireStore.Services
             });
         }
 
-        public async Task<ApiResponse?> ValidateStripeSession(int orderHeaderId)
+        public async Task<ApiResponse?> GetAllAsync()
+        {
+            return await _bs.SendAsync(new ApiRequest
+            {
+                ApiMethod = SD.ApiMethod.GET,
+                Url = $"{SD.OrderApiBaseAddress}api/orders"
+            });
+        }
+
+        public async Task<ApiResponse?> GetByIdAsync(int orderId)
+        {
+            return await _bs.SendAsync(new ApiRequest
+            {
+                ApiMethod = SD.ApiMethod.GET,
+                Url = $"{SD.OrderApiBaseAddress}api/orders/{orderId}"
+            });
+        }
+
+        public async Task<ApiResponse?> UpdateStatusAsync(int orderId, string newStatus)
+        {
+            return await _bs.SendAsync(new ApiRequest
+            {
+                ApiMethod = SD.ApiMethod.POST,
+                Url = $"{SD.OrderApiBaseAddress}api/orders/{orderId}/set-status/{newStatus}",
+            });
+        }
+
+        public async Task<ApiResponse?> ValidateStripeSessionAsync(int orderHeaderId)
         {
             return await _bs.SendAsync(new ApiRequest
             {

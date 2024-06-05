@@ -1,3 +1,5 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text.Json;
 using AppLib.ServiceBus.Services.IService;
 using BimshireStore.Services.OrderAPI.Data;
@@ -38,11 +40,15 @@ namespace BimshireStore.Services.OrderAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<ApiResponse>> GetAll([FromQuery] string? userId)
+        public async Task<ActionResult<ApiResponse>> GetAll()
         {
             try
             {
+                var userId = (User.Identity as ClaimsIdentity)?.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
                 IEnumerable<OrderHeader> orderHeaders;
+
+                Console.WriteLine(userId);
+
                 if (User.IsInRole(SD.Role_Admin))
                 {
                     orderHeaders = await _db.OrderHeaders.Include(x => x.OrderDetails).OrderByDescending(x => x.OrderHeaderId).ToListAsync();
@@ -51,6 +57,7 @@ namespace BimshireStore.Services.OrderAPI.Controllers
                 {
                     orderHeaders = await _db.OrderHeaders.Include(x => x.OrderDetails).Where(x => x.UserId == userId).OrderByDescending(x => x.OrderHeaderId).ToListAsync();
                 }
+
                 return Ok(
                     new ApiResponse
                     {
@@ -75,18 +82,28 @@ namespace BimshireStore.Services.OrderAPI.Controllers
         }
 
         [Authorize]
-        [HttpGet("Id:int")]
+        [HttpGet("{orderId:int}")]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<ApiResponse>> GetById([FromRoute] int Id)
+        public async Task<ActionResult<ApiResponse>> GetById([FromRoute] int orderId)
         {
             try
             {
-                var orderHeader = await _db.OrderHeaders.Include(x => x.OrderDetails).FirstOrDefaultAsync(x => x.OrderHeaderId == Id);
+                var userId = (User.Identity as ClaimsIdentity)?.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+                OrderHeader? orderHeader;
+
+                if (User.IsInRole(SD.Role_Admin))
+                {
+                    orderHeader = await _db.OrderHeaders.Include(x => x.OrderDetails).FirstOrDefaultAsync(x => x.OrderHeaderId == orderId);
+                }
+                else
+                {
+                    orderHeader = await _db.OrderHeaders.Include(x => x.OrderDetails).FirstOrDefaultAsync(x => x.UserId == userId && x.OrderHeaderId == orderId);
+                }
 
                 if (orderHeader is not null)
                 {
@@ -130,7 +147,7 @@ namespace BimshireStore.Services.OrderAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<ApiResponse>> CreateOrder([FromBody] CartDto cart)
+        public async Task<ActionResult<ApiResponse>> CreateOrderAsync([FromBody] CartDto cart)
         {
             try
             {
@@ -188,7 +205,7 @@ namespace BimshireStore.Services.OrderAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<ApiResponse>> CreateStripeSession([FromBody] StripeRequest stripeRequest)
+        public async Task<ActionResult<ApiResponse>> CreateStripeSessionAsync([FromBody] StripeRequest stripeRequest)
         {
             try
             {
@@ -270,7 +287,7 @@ namespace BimshireStore.Services.OrderAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<ApiResponse>> ValidateStripeSession([FromBody] int orderHeaderId)
+        public async Task<ActionResult<ApiResponse>> ValidateStripeSessionAsync([FromBody] int orderHeaderId)
         {
             try
             {
@@ -349,5 +366,67 @@ namespace BimshireStore.Services.OrderAPI.Controllers
             }
         }
 
+        [Authorize]
+        [HttpPost("{orderId:int}/set-status/{newStatus}")]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<ApiResponse>> SetStatus([FromRoute] int orderId, [FromRoute] string newStatus)
+        {
+            try
+            {
+                var orderHeader = await _db.OrderHeaders.FirstOrDefaultAsync(x => x.OrderHeaderId == orderId);
+
+                if (orderHeader is not null)
+                {
+                    if (newStatus == SD.Status_Cancelled)
+                    {
+                        // refund customer
+                        var options = new Stripe.RefundCreateOptions
+                        {
+                            Reason = Stripe.RefundReasons.RequestedByCustomer,
+                            PaymentIntent = orderHeader.PaymentIntentId
+                        };
+
+                        var service = new Stripe.RefundService();
+                        var refund = service.CreateAsync(options);
+                    }
+
+                    orderHeader.Status = newStatus;
+                    await _db.SaveChangesAsync();
+
+                    return Ok(
+                        new ApiResponse
+                        {
+                            IsSuccess = true,
+                            StatusCode = System.Net.HttpStatusCode.OK
+                        });
+                }
+
+                return NotFound(
+                    new ApiResponse
+                    {
+                        IsSuccess = false,
+                        ErrorMessages = ["Order not found"],
+                        StatusCode = System.Net.HttpStatusCode.NotFound
+                    });
+            }
+            catch (Exception ex)
+            {
+                return new ObjectResult(
+                    new ApiResponse
+                    {
+                        IsSuccess = false,
+                        Result = null,
+                        ErrorMessages = [ex.Message],
+                        StatusCode = System.Net.HttpStatusCode.InternalServerError
+                    }
+                )
+                { StatusCode = StatusCodes.Status500InternalServerError };
+            }
+        }
     }
 }
