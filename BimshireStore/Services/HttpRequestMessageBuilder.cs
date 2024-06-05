@@ -41,13 +41,14 @@ namespace BimshireStore.Services
                     foreach (var item in apiRequest.Data.GetType().GetProperties())
                     {
                         var value = item.GetValue(apiRequest.Data);
-                        if (value is IBrowserFile)
+
+                        if (value is IBrowserFile browserFile) // C# pattern matching with implicit is not null check
                         {
-                            var file = (IBrowserFile)value;
-                            if (file is not null)
-                            {
-                                content.Add(new StreamContent(file.OpenReadStream()), item.Name, file.Name);
-                            }
+                            content.Add(new StreamContent(browserFile.OpenReadStream()), item.Name, browserFile.Name);
+                        }
+                        else if (value is IFormFile formFile) // C# pattern matching with implicit is not null check
+                        {
+                            content.Add(new StreamContent(formFile.OpenReadStream()), item.Name, formFile.Name);
                         }
                         else
                         {
