@@ -9,5 +9,6 @@ namespace BimshireStore.Services.ProductAPI.Models.Dto
         public string? Description { get; set; }
         public string? CategoryName { get; set; }
         public string? ImageUrl { get; set; }
+        public string? ImageLocalPath { get; set; }
     }
 }

@@ -19,7 +19,8 @@ namespace BimshireStore.Services.ProductAPI.Models.Extensions
                 Price = Product.Price,
                 Description = Product.Description,
                 CategoryName = Product.CategoryName,
-                ImageUrl = Product.ImageUrl
+                ImageUrl = Product.ImageUrl,
+                ImageLocalPath = Product.ImageLocalPath
             };
         }
 
