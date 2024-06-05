@@ -36,6 +36,7 @@ namespace BimshireStore.Services
             return await _bs.SendAsync(new ApiRequest
             {
                 ApiMethod = SD.ApiMethod.POST,
+                ContentType = SD.ContentType.MultiPartFormData,
                 Url = $"{SD.ProductApiBaseAddress}api/products",
                 Data = product
             });
@@ -46,6 +47,7 @@ namespace BimshireStore.Services
             return await _bs.SendAsync(new ApiRequest
             {
                 ApiMethod = SD.ApiMethod.PUT,
+                ContentType = SD.ContentType.MultiPartFormData,
                 Url = $"{SD.ProductApiBaseAddress}api/products",
                 Data = product
             });
