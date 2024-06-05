@@ -4,10 +4,7 @@ using BimshireStore.Models;
 using BimshireStore.Services.IService;
 using System.Text.Json;
 using BimshireStore.Models.Dto;
-using static BimshireStore.Utility.SD;
 using Microsoft.AspNetCore.Authorization;
-using System.Security.Claims;
-using Microsoft.IdentityModel.JsonWebTokens;
 using BimshireStore.Utility;
 
 namespace BimshireStore.Controllers;
@@ -33,50 +30,86 @@ public class OrderController : Controller
 
     [Authorize]
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> OrderDetail(int orderId)
     {
-        var response = await _orderService.GetAllAsync();
+        var response = await _orderService.GetByIdAsync(orderId);
+
         if (response is not null && response.IsSuccess)
         {
-            var orders = JsonSerializer.Deserialize<List<OrderHeaderDto>>(JsonSerializer.Serialize(response.Result), JsonSerializerConfig.DefaultOptions);
-            return Json(new { data = orders });
+            var order = JsonSerializer.Deserialize<OrderHeaderDto>(JsonSerializer.Serialize(response.Result), SD.JsonSerializerConfig.DefaultOptions);
+            if (order is not null)
+            {
+                return View(order);
+            }
         }
 
-        return Json(new { data = new List<OrderHeaderDto>() });
+        return NotFound();
     }
 
-    // [HttpGet]
-    // public async Task<IActionResult> OrderDetail()
-    // {
-    //     await Task.CompletedTask;
-    //     return View();
-    // }
+    [Authorize]
+    [HttpPost]
+    public async Task<IActionResult> ReadyForPickup(int orderId)
+    {
+        var response = await _orderService.SetStatusAsync(orderId, SD.Status_ReadyForPickup);
 
-    // [HttpPost]
-    // public async Task<IActionResult> OrderDetail(OrderDto order)
-    // {
-    //     if (ModelState.IsValid)
-    //     {
-    //         var response = await _couponService.CreateAsync(coupon);
-    //         if (response is not null && response.IsSuccess)
-    //         {
-    //             TempData["success"] = "Operation completed successfully";
-    //             return RedirectToAction(nameof(OrderIndex));
-    //         }
-    //         else
-    //         {
-    //             TempData["error"] = string.Join(" | ", response?.ErrorMessages ?? ["Oops, Something went wrong"]);
-    //         }
-    //     }
+        if (response is not null && response.IsSuccess)
+        {
+            TempData["success"] = "Operation completed successfully";
+            return RedirectToAction(nameof(OrderDetail), "Order", new { orderId = orderId });
+        }
 
-    //     return View(coupon);
-    // }
+        return View();
+    }
 
+    [Authorize]
+    [HttpPost]
+    public async Task<IActionResult> CompleteOrder(int orderId)
+    {
+        var response = await _orderService.SetStatusAsync(orderId, SD.Status_Completed);
 
+        if (response is not null && response.IsSuccess)
+        {
+            TempData["success"] = "Operation completed successfully";
+            return RedirectToAction(nameof(OrderDetail), "Order", new { orderId = orderId });
+        }
+
+        return View();
+    }
+
+    [Authorize]
+    [HttpPost]
+    public async Task<IActionResult> CancelOrder(int orderId)
+    {
+        var response = await _orderService.SetStatusAsync(orderId, SD.Status_Cancelled);
+
+        if (response is not null && response.IsSuccess)
+        {
+            TempData["success"] = "Operation completed successfully";
+            return RedirectToAction(nameof(OrderDetail), "Order", new { orderId = orderId });
+        }
+
+        return View();
+    }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
+
+    #region REST API 
+    [Authorize]
+    [HttpGet]
+    public async Task<IActionResult> GetAll()
+    {
+        var response = await _orderService.GetAllAsync();
+        if (response is not null && response.IsSuccess)
+        {
+            var orders = JsonSerializer.Deserialize<List<OrderHeaderDto>>(JsonSerializer.Serialize(response.Result), SD.JsonSerializerConfig.DefaultOptions);
+            return Json(new { data = orders });
+        }
+
+        return Json(new { data = new List<OrderHeaderDto>() });
+    }
+    #endregion
 }

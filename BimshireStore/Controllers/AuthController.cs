@@ -129,6 +129,7 @@ public class AuthController : Controller
 
         // Need to specifically add this claimtype to populate User.Identity.Name on the front end
         claims.Add(new Claim(ClaimTypes.Name, jwtToken.Claims.First(x => x.Type == "name").Value));
+        claims.Add(new Claim(ClaimTypes.Role, jwtToken.Claims.First(x => x.Type == "role").Value));
 
         var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme));
         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);

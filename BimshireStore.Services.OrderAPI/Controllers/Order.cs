@@ -47,8 +47,6 @@ namespace BimshireStore.Services.OrderAPI.Controllers
                 var userId = (User.Identity as ClaimsIdentity)?.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
                 IEnumerable<OrderHeader> orderHeaders;
 
-                Console.WriteLine(userId);
-
                 if (User.IsInRole(SD.Role_Admin))
                 {
                     orderHeaders = await _db.OrderHeaders.Include(x => x.OrderDetails).OrderByDescending(x => x.OrderHeaderId).ToListAsync();

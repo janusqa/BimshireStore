@@ -62,7 +62,11 @@ builder.Services
          };
          x.Audience = jwtSettings.Audiences?[0];
          x.ClaimsIssuer = jwtSettings?.Issuer;
+         // Fix broken remapping of claims
+         // https://nestenius.se/2023/06/02/debugging-jwtbearer-claim-problems-in-asp-net-core/
          x.MapInboundClaims = false; // Microsoft remaps claims differently. Stop it!!!
+         x.TokenValidationParameters.RoleClaimType = "role"; // Microsoft remaps claims differently. Stop it!!!
+         x.TokenValidationParameters.NameClaimType = "name"; // Microsoft remaps claims differently. Stop it!!!
      });
 
 // builder.Services.AddAuthentication().AddBearerToken(IdentityConstants.BearerScheme);

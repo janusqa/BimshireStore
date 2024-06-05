@@ -30,13 +30,19 @@ function loadDataTable(status) {
             {
                 data: 'orderTotal',
                 width: '10%',
-                render: DataTable.render.number(null, null, 2, '$'),
+                render: function (data) {
+                    const formatter = new Intl.NumberFormat('en-US', {
+                        style: 'currency',
+                        currency: 'USD',
+                    });
+                    return formatter.format(data);
+                },
             },
             {
                 data: 'orderHeaderId',
                 render: function (data) {
                     return `<div class="w-75 btn-group" role="group">
-                    <a href="/order/orderDetail?orderId=${data}" class="btn btn-primary mx-2"><i class="bi bi-pencil-square"></i></a>
+                    <a href="/Order/OrderDetail?orderId=${data}" class="btn btn-primary mx-2"><i class="bi bi-pencil-square"></i></a>
                     </div>`;
                 },
                 width: '10%',

@@ -9,7 +9,7 @@ namespace BimshireStore.Services.IService
         Task<ApiResponse?> ValidateStripeSessionAsync(int orderHeaderId);
         Task<ApiResponse?> GetAllAsync();
         Task<ApiResponse?> GetByIdAsync(int orderId);
-        Task<ApiResponse?> UpdateStatusAsync(int orderId, string newStatus);
+        Task<ApiResponse?> SetStatusAsync(int orderId, string newStatus);
 
     }
 }

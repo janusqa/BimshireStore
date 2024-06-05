@@ -50,7 +50,7 @@ namespace BimshireStore.Services
             });
         }
 
-        public async Task<ApiResponse?> UpdateStatusAsync(int orderId, string newStatus)
+        public async Task<ApiResponse?> SetStatusAsync(int orderId, string newStatus)
         {
             return await _bs.SendAsync(new ApiRequest
             {
