@@ -4,14 +4,17 @@ using BimshireStore.Models;
 using BimshireStore.Services.IService;
 using System.Text.Json;
 using BimshireStore.Models.Dto;
-using static BimshireStore.Utility.SD;
+using Microsoft.AspNetCore.Authorization;
+using BimshireStore.Utility;
 
 namespace BimshireStore.Controllers;
 
+[Authorize(Roles = $"{SD.Role_Admin}")]
 public class ProductController : Controller
 {
     private readonly ILogger<ProductController> _logger;
     private readonly IProductService _productService;
+
 
     public ProductController(ILogger<ProductController> logger, IProductService productService)
     {
@@ -26,7 +29,7 @@ public class ProductController : Controller
 
         if (response is not null && response.IsSuccess)
         {
-            var products = JsonSerializer.Deserialize<List<ProductDto>>(JsonSerializer.Serialize(response.Result), JsonSerializerConfig.DefaultOptions);
+            var products = JsonSerializer.Deserialize<List<ProductDto>>(JsonSerializer.Serialize(response.Result), SD.JsonSerializerConfig.DefaultOptions);
             return View(products);
         }
         else
@@ -70,7 +73,7 @@ public class ProductController : Controller
 
         if (response is not null && response.IsSuccess)
         {
-            var product = JsonSerializer.Deserialize<ProductDto>(JsonSerializer.Serialize(response.Result), JsonSerializerConfig.DefaultOptions);
+            var product = JsonSerializer.Deserialize<ProductDto>(JsonSerializer.Serialize(response.Result), SD.JsonSerializerConfig.DefaultOptions);
             return View(product);
         }
         else
@@ -107,7 +110,7 @@ public class ProductController : Controller
 
         if (response is not null && response.IsSuccess)
         {
-            var product = JsonSerializer.Deserialize<ProductDto>(JsonSerializer.Serialize(response.Result), JsonSerializerConfig.DefaultOptions);
+            var product = JsonSerializer.Deserialize<ProductDto>(JsonSerializer.Serialize(response.Result), SD.JsonSerializerConfig.DefaultOptions);
             return View(product);
         }
         else

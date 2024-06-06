@@ -4,10 +4,12 @@ using BimshireStore.Models;
 using BimshireStore.Services.IService;
 using System.Text.Json;
 using BimshireStore.Models.Dto;
-using static BimshireStore.Utility.SD;
+using Microsoft.AspNetCore.Authorization;
+using BimshireStore.Utility;
 
 namespace BimshireStore.Controllers;
 
+[Authorize(Roles = $"{SD.Role_Admin}")]
 public class CouponController : Controller
 {
     private readonly ILogger<CouponController> _logger;
@@ -26,7 +28,7 @@ public class CouponController : Controller
 
         if (response is not null && response.IsSuccess)
         {
-            var coupons = JsonSerializer.Deserialize<List<CouponDto>>(JsonSerializer.Serialize(response.Result), JsonSerializerConfig.DefaultOptions);
+            var coupons = JsonSerializer.Deserialize<List<CouponDto>>(JsonSerializer.Serialize(response.Result), SD.JsonSerializerConfig.DefaultOptions);
             return View(coupons);
         }
         else
@@ -70,7 +72,7 @@ public class CouponController : Controller
 
         if (response is not null && response.IsSuccess)
         {
-            var coupon = JsonSerializer.Deserialize<CouponDto>(JsonSerializer.Serialize(response.Result), JsonSerializerConfig.DefaultOptions);
+            var coupon = JsonSerializer.Deserialize<CouponDto>(JsonSerializer.Serialize(response.Result), SD.JsonSerializerConfig.DefaultOptions);
             return View(coupon);
         }
         else

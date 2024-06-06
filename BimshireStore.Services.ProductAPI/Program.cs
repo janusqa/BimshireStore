@@ -1,6 +1,8 @@
 using System.Text;
 using BimshireStore.Services.ProductAPI.Data;
 using BimshireStore.Services.ProductAPI.Models;
+using BimshireStore.Services.ProductAPI.Services;
+using BimshireStore.Services.ProductAPI.Services.IService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
@@ -64,8 +66,27 @@ builder.Services.AddAuthentication(x =>
 // Authorization
 builder.Services.AddAuthorizationBuilder();
 
+// CORS
+// builder.Services.AddCors(options =>
+// {
+//     // We can have multiple policies one per expected client. 
+//     // In pipeline activate like
+//     //  app.UseCors("BlazorWasmClient");
+//     //  app.UseCors("BlazorWasmClient_2"); // if you have a second client policy.
+//     // This is the policy for the Blazor WASM Client
+//     options.AddPolicy("Frontend", builder =>
+//         builder
+//             .WithOrigins("https://localhost:7209", "http://localhost:5016")
+//             .WithMethods("GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS")
+//             .WithHeaders("Origin", "X-Requested-With", "Content-Type", "Authorization", "X-Xsrf-Token",
+//                 "X-Forwarded-For", "X-Real-IP")
+//             .AllowCredentials()
+//     );
+// });
+
 // Other Services
 builder.Services.AddScoped<IDbInitializer, DbInitializer>();
+builder.Services.AddScoped<IFileService, FileService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -108,12 +129,22 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// app.UseCors("Frontend");
+
+// Logging middleware
+app.Use(async (context, next) =>
+{
+    Console.WriteLine($"Request: {context.Request.Path}");
+    await next.Invoke();
+});
+
+app.UseStaticFiles();
+
 app.UseHttpsRedirection();
+
 
 app.UseAuthentication();
 app.UseAuthorization();
-
-app.UseStaticFiles();
 
 app.MapControllers();
 

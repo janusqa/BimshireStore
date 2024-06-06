@@ -48,7 +48,7 @@ namespace BimshireStore.Services
                         }
                         else if (value is IFormFile formFile) // C# pattern matching with implicit is not null check
                         {
-                            content.Add(new StreamContent(formFile.OpenReadStream()), item.Name, formFile.Name);
+                            content.Add(new StreamContent(formFile.OpenReadStream()), item.Name, formFile.FileName);
                         }
                         else
                         {

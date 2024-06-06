@@ -10,9 +10,9 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/BimshireStore/bin/Debug/net8.0/BimshireStore.dll",
+            "program": "${workspaceFolder}/BimshireStore.Services.ProductAPI/bin/Debug/net8.0/BimshireStore.Services.ProductAPI.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/BimshireStore",
+            "cwd": "${workspaceFolder}/BimshireStore.Services.ProductAPI",
             "stopAtEntry": false,
             // Enable launching a web browser when ASP.NET Core starts. For more information: https://aka.ms/VSCode-CS-LaunchJson-WebBrowser
             "serverReadyAction": {

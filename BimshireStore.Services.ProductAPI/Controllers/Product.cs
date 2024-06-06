@@ -2,6 +2,7 @@ using BimshireStore.Services.ProductAPI.Data;
 using BimshireStore.Services.ProductAPI.Models;
 using BimshireStore.Services.ProductAPI.Models.Dto;
 using BimshireStore.Services.ProductAPI.Models.Extensions;
+using BimshireStore.Services.ProductAPI.Services.IService;
 using BimshireStore.Services.ProductAPI.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,10 +15,12 @@ namespace BimshireStore.Services.ProductAPI.Controllers
     public class ProductController : ControllerBase
     {
         private readonly ApplicationDbContext _db;
+        private readonly IFileService _fileService;
 
-        public ProductController(ApplicationDbContext db)
+        public ProductController(ApplicationDbContext db, IFileService fileService)
         {
             _db = db;
+            _fileService = fileService;
         }
 
         [HttpGet("")]
@@ -27,7 +30,7 @@ namespace BimshireStore.Services.ProductAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<ApiResponse>> Get()
+        public async Task<ActionResult<ApiResponse>> GetAll()
         {
             try
             {
@@ -63,7 +66,7 @@ namespace BimshireStore.Services.ProductAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<ApiResponse>> Get([FromRoute] int Id)
+        public async Task<ActionResult<ApiResponse>> GetById([FromRoute] int Id)
         {
             try
             {
@@ -107,26 +110,40 @@ namespace BimshireStore.Services.ProductAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<ApiResponse>> Post([FromBody] ProductDto productDto)
+        public async Task<ActionResult<ApiResponse>> Post([FromForm] ProductDto productDto)
         {
             try
             {
-                var Product = new Product
+                var product = new Product
                 {
                     Name = productDto.Name,
                     Price = productDto.Price,
                     Description = productDto.Description,
                     CategoryName = productDto.CategoryName,
-                    ImageUrl = productDto.ImageUrl
+                    ImageUrl = "https://placehold.co/600x400"
                 };
-                await _db.Products.AddAsync(Product);
+
+                if (productDto.File is not null)
+                {
+                    Console.WriteLine(Path.GetExtension(productDto.File.FileName));
+                    var (FileUrl, Error) = await _fileService.CreateFileSSR(productDto.File);
+
+                    if (Error is null && !string.IsNullOrWhiteSpace(FileUrl))
+                    {
+                        var baseUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.Value}{HttpContext.Request.PathBase.Value}";
+                        product.ImageLocalPath = FileUrl;
+                        product.ImageUrl = $"{baseUrl}{FileUrl}";
+                    }
+                }
+
+                await _db.Products.AddAsync(product);
                 await _db.SaveChangesAsync();
 
                 return Ok(
                     new ApiResponse
                     {
                         IsSuccess = true,
-                        Result = Product.ToDto(),
+                        Result = product.ToDto(),
                         StatusCode = System.Net.HttpStatusCode.OK
                     });
             }
@@ -153,11 +170,11 @@ namespace BimshireStore.Services.ProductAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<ApiResponse>> Put([FromBody] ProductDto productDto)
+        public async Task<ActionResult<ApiResponse>> Put([FromForm] ProductDto productDto)
         {
             try
             {
-                var Product = new Product
+                var product = new Product
                 {
                     ProductId = productDto.ProductId,
                     Name = productDto.Name,
@@ -166,14 +183,30 @@ namespace BimshireStore.Services.ProductAPI.Controllers
                     CategoryName = productDto.CategoryName,
                     ImageUrl = productDto.ImageUrl
                 };
-                _db.Products.Update(Product);
+
+
+                var existingFileUrl = (await _db.Products.AsNoTracking().FirstOrDefaultAsync(x => x.ProductId == productDto.ProductId))?.ImageLocalPath;
+
+                if (productDto.File is not null)
+                {
+                    var (FileUrl, Error) = await _fileService.CreateFileSSR(productDto.File, existingFileUrl);
+
+                    if (Error is null && !string.IsNullOrWhiteSpace(FileUrl))
+                    {
+                        var baseUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.Value}{HttpContext.Request.PathBase.Value}";
+                        product.ImageLocalPath = FileUrl;
+                        product.ImageUrl = $"{baseUrl}{FileUrl}";
+                    }
+                }
+
+                _db.Products.Update(product);
                 await _db.SaveChangesAsync();
 
                 return Ok(
                     new ApiResponse
                     {
                         IsSuccess = true,
-                        Result = Product.ToDto(),
+                        Result = product.ToDto(),
                         StatusCode = System.Net.HttpStatusCode.OK
                     });
             }
@@ -207,8 +240,10 @@ namespace BimshireStore.Services.ProductAPI.Controllers
                 var product = await _db.Products.FirstOrDefaultAsync(x => x.ProductId == Id);
                 if (product is not null)
                 {
+                    var existingFileUrl = product.ImageLocalPath;
                     _db.Products.Remove(product);
                     await _db.SaveChangesAsync();
+                    _fileService.DeleteFile(existingFileUrl);
 
 
                     return Ok(

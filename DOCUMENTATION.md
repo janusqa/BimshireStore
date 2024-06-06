@@ -556,6 +556,7 @@ Image uploads
 ---
 1. Enable static files in api project
    add "app.UseStaticFiles()" to program.cs
+   WebAPI Controllers handling uploads must be decorated with [FromForm]
 
 Exception Filters 
 ---
@@ -740,3 +741,11 @@ Add wwwroot folder to an api for sharing static resources
 ===
 1. Create "wwwroot" folder in the root of API project
 2. add "app.UseStaticFiles();" to pipeline in "Program.cs"
+
+File uploads
+===
+1. Ensure your HTTPMessageBuilder is properly handling both multipart and non multipart content
+2. Ensure your service has content type set appropriately. Json by defult or Mulitpart explicitly
+3. Ensure your endpoint that service calls out to handles file processing properly
+4. Ensure you have set up sharing static resources in the project
+5. IMPORTANT: WebAPI Controllers handling uploads must be decorated with [FromForm]
