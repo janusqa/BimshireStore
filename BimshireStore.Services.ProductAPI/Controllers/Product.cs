@@ -248,7 +248,6 @@ namespace BimshireStore.Services.ProductAPI.Controllers
                     await _db.SaveChangesAsync();
                     _fileService.DeleteFile(existingFileUrl);
 
-
                     return Ok(
                         new ApiResponse
                         {
