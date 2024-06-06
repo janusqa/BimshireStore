@@ -1,6 +1,6 @@
 @model ProductDto
 
-<form asp-action="ProductEdit">
+<form asp-action="ProductEdit" enctype="multipart/form-data" method="POST">
     <br />
     <div class="container border p-3">
         <h1 class="text-white text-center">Edit Product</h1>
@@ -29,21 +29,19 @@
                 <span asp-validation-for="Description" class="text-danger" />
             </div>
             <div class="col-2">
-                <label class="control-label pt-2" style="font-size:20px;">ImageUrl</label>
-            </div>
-            <div class="col-10 pb-3">
-                <input asp-for="ImageUrl" class="form-control" />
-                <span asp-validation-for="ImageUrl" class="text-danger" />
-            </div>
-            <div class="col-2">
                 <label class="control-label pt-2" style="font-size:20px;">Price</label>
             </div>
             <div class="col-10 pb-3">
                 <input asp-for="Price" class="form-control" />
                 <span asp-validation-for="Price" class="text-danger" />
             </div>
+            <div class="col-2">
+                <label class="control-label pt-2" style="font-size:20px;">ImageUrl</label>
+            </div>
+            <div class="col-10 pb-3">
+                <input type="file" asp-for="File" class="form-control" />
+            </div>
             <div class="col-5 offset-2">
-
                 <a class="btn-primary btn form-control" asp-area="" asp-controller="Product"
                     asp-action="ProductIndex">Back to List</a>
             </div>

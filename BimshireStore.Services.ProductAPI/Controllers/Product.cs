@@ -125,7 +125,6 @@ namespace BimshireStore.Services.ProductAPI.Controllers
 
                 if (productDto.File is not null)
                 {
-                    Console.WriteLine(Path.GetExtension(productDto.File.FileName));
                     var (FileUrl, Error) = await _fileService.CreateFileSSR(productDto.File);
 
                     if (Error is null && !string.IsNullOrWhiteSpace(FileUrl))
@@ -174,22 +173,26 @@ namespace BimshireStore.Services.ProductAPI.Controllers
         {
             try
             {
-                var product = new Product
+                var product = await _db.Products.FirstOrDefaultAsync(x => x.ProductId == productDto.ProductId);
+
+                if (product is null)
                 {
-                    ProductId = productDto.ProductId,
-                    Name = productDto.Name,
-                    Price = productDto.Price,
-                    Description = productDto.Description,
-                    CategoryName = productDto.CategoryName,
-                    ImageUrl = productDto.ImageUrl
+                    return NotFound(
+                        new ApiResponse
+                        {
+                            IsSuccess = false,
+                            StatusCode = System.Net.HttpStatusCode.NotFound
+                        });
                 };
 
-
-                var existingFileUrl = (await _db.Products.AsNoTracking().FirstOrDefaultAsync(x => x.ProductId == productDto.ProductId))?.ImageLocalPath;
+                product.Name = productDto.Name;
+                product.Price = productDto.Price;
+                product.Description = productDto.Description;
+                product.CategoryName = productDto.CategoryName;
 
                 if (productDto.File is not null)
                 {
-                    var (FileUrl, Error) = await _fileService.CreateFileSSR(productDto.File, existingFileUrl);
+                    var (FileUrl, Error) = await _fileService.CreateFileSSR(productDto.File, product.ImageLocalPath);
 
                     if (Error is null && !string.IsNullOrWhiteSpace(FileUrl))
                     {

@@ -749,3 +749,6 @@ File uploads
 3. Ensure your endpoint that service calls out to handles file processing properly
 4. Ensure you have set up sharing static resources in the project
 5. IMPORTANT: WebAPI Controllers handling uploads must be decorated with [FromForm]
+6. Make sure your form has property enctype="multipart/form-data" method="POST" 
+7. Make sure your form has type="file"
+8. Make sure your form field for upload has a name that matches the fieldname exactly that represents the file in the model
