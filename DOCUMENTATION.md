@@ -29,19 +29,20 @@
    5. dotnet tool update dotnet-ef
    6. dotnet tool update dotnet-aspnet-codegenerator
    
-4. Scaffold the type of app you want
+4. Scaffold the type of app you want (https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-new)
    1. dotnet new sln
-   2. dotnet new console --output [<foldername/namespace>] --framework net7.0  //console app
-   3. dotnet new classlib --output [<foldername/namespace>] --framework net7.0  //class library app
-   4. dotnet new mstest --output [<foldername/namespace>] //unit test app
-   5. after adding your various projects need to now add them to the solution you oringally created
+   2. dotnet new web --output [<foldername/namespace>] // empty project
+   3. dotnet new console --output [<foldername/namespace>] --framework net7.0  //console app
+   4. dotnet new classlib --output [<foldername/namespace>] --framework net7.0  //class library app
+   5. dotnet new mstest --output [<foldername/namespace>] //unit test app
+   6. after adding your various projects need to now add them to the solution you oringally created
       1. dotnet sln add [<foldername/namespace>]/[<foldername/namespace>].csproj
-   6. to reference a classlib in a console/desktop app
+   7. to reference a classlib in a console/desktop app
       1. dotnet add [<namespace-folder-console-desktop>]/[<namespace-folder-console-desktop>].csproj reference [<namespace-folder-classlib>]/[<namespace-folder-classlib>].csproj
       2. in the case of test projects... 
          1. dotnet add [<testproject>]/[<testproject>].csproj reference [<mainproject>/<mainproject>].csproj
          2. Run test: dotnet test [<testproject>/<testproject>].csproj
-   7. dotnet new webapi --use-controllers -o [<project-name>]  // for minimalAPI remove --use-controllers
+   8. dotnet new webapi --use-controllers -o [<project-name>]  // for minimalAPI remove --use-controllers
       1. dotnet add package Microsoft.EntityFrameworkCore.InMemory
       2. dotnet add package Microsoft.AspNetCore.JsonPatch
       3. dotnet add package Microsoft.AspNetCore.Mvc.NewtonsoftJson
@@ -49,7 +50,7 @@
       5. dotnet add package Microsoft.EntityFrameworkCore.Abstractions (for index annotations)
       6. dotnet add package Microsoft.EntityFrameworkCore.SqlServer
       7. dotnet add package Microsoft.EntityFrameworkCore.Tools
-   8. dotnet new mvc -au Individual -uld --output [<foldername/namespace>] --framework net7.0  // ASP.Net core web app mvc
+   9. dotnet new mvc -au Individual -uld --output [<foldername/namespace>] --framework net7.0  // ASP.Net core web app mvc
       1. The -au Individual paramater makes it use Individual User accounts. The -uld has it use SQL Server instead of SQLite. 
       2. change connecting string in appsettings.json
       3. dotnet ef database update

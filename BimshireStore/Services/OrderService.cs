@@ -22,16 +22,6 @@ namespace BimshireStore.Services
             });
         }
 
-        public async Task<ApiResponse?> CreateStripeSessionAsync(StripeRequest stripeRequest)
-        {
-            return await _bs.SendAsync(new ApiRequest
-            {
-                ApiMethod = SD.ApiMethod.POST,
-                Data = stripeRequest,
-                Url = $"{SD.OrderApiBaseAddress}api/orders/create-stripe-session"
-            });
-        }
-
         public async Task<ApiResponse?> GetAllAsync()
         {
             return await _bs.SendAsync(new ApiRequest
@@ -56,6 +46,16 @@ namespace BimshireStore.Services
             {
                 ApiMethod = SD.ApiMethod.POST,
                 Url = $"{SD.OrderApiBaseAddress}api/orders/{orderId}/set-status/{newStatus}",
+            });
+        }
+
+        public async Task<ApiResponse?> CreateStripeSessionAsync(StripeRequest stripeRequest)
+        {
+            return await _bs.SendAsync(new ApiRequest
+            {
+                ApiMethod = SD.ApiMethod.POST,
+                Data = stripeRequest,
+                Url = $"{SD.OrderApiBaseAddress}api/orders/create-stripe-session"
             });
         }
 

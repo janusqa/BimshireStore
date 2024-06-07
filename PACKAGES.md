@@ -13,6 +13,12 @@ Auth API (additional packages)
 - dotnet add BimshireStore.Services.AuthAPI package Microsoft.AspNetCore.Identity.EntityFrameworkCore
 - dotnet add BimshireStore.Services.AuthAPI package RabbitMQ.Client
 
+Gateway
+===
+- dotnet add BimshireStore.Services.CouponAPI package Microsoft.AspNetCore.Authentication.JwtBearer
+- dotnet add BimshireStore.Services.CouponAPI package IdentityModel
+- dotnet add BimshireStore.Services.CouponAPI package Ocelot
+
 UI (additional packages)
 ===
 - dotnet add BimshireStore package Microsoft.IdentityModel.JsonWebTokens
