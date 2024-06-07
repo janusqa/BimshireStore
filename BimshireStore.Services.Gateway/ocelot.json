@@ -184,7 +184,7 @@
                     "Port": 7003
                 }
             ],
-            "UpstreamPathTemplate": "/api/carts/email-request",
+            "UpstreamPathTemplate": "/api/carts/email-cart",
             "UpstreamHttpMethod": [
                 "POST"
             ],
@@ -274,7 +274,7 @@
                     "Port": 7004
                 }
             ],
-            "UpstreamPathTemplate": "/api/order/create-stripe-session",
+            "UpstreamPathTemplate": "/api/orders/create-stripe-session",
             "UpstreamHttpMethod": [
                 "POST"
             ],
